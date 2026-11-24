@@ -1179,6 +1179,41 @@
       #voice-select-wrap,#voice-select{min-width:150px}
     }
 
+  
+    /* KOLLECTIF R5 — compactage supplémentaire sans modifier le moteur */
+    .keypoints-list{min-width:0;list-style-position:outside}
+    .keypoints-list li{display:list-item;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;cursor:help}
+    .verbatim-quote{margin-bottom:0}
+    .acronym-row{grid-template-columns:30px minmax(0,1fr);gap:8px;padding:6px 9px;min-width:0}
+    .acronym-desc{display:block;overflow:hidden;min-width:0;white-space:nowrap;text-overflow:ellipsis;cursor:help}
+    .acronym-desc strong,.acronym-desc span{display:inline!important;font-size:.81rem;white-space:nowrap}
+    .acronym-desc strong{margin-right:5px}
+    .mnemonic-card{min-width:0}
+    .controls-row{flex-wrap:nowrap!important;justify-content:flex-start;align-items:flex-end;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;gap:9px;padding-bottom:4px}
+    .controls-group{flex-wrap:nowrap!important;gap:7px;flex:0 0 auto}
+    .controls-group .btn{flex:0 0 auto}
+    .controls-group .field-stack{flex:0 0 auto}
+    #voice-select-wrap,#voice-select{min-width:110px!important;width:130px!important;max-width:130px}
+    #speed-select{min-width:92px;width:92px;max-width:92px}
+    .transport-well{min-width:0}
+    .subtitle-well .subtitle-meta #subtitle-phase-label{color:var(--primary);font-weight:700}
+    .subtitle-well .subtitle-text{color:var(--tertiary);font-weight:500}
+    .studio03-duration-row{flex-wrap:nowrap!important;min-width:0}
+    .studio03-duration-row label{white-space:nowrap!important;flex:0 0 auto;max-width:unset}
+    .studio03-duration-row .icon-tool{flex:0 0 42px}
+    .studio03-duration-row #studio03-duration{flex:0 0 66px}
+    .studio03-time-row{flex-wrap:nowrap!important}
+    .studio03-bar > strong{white-space:nowrap}
+    .studio03 .studio03-name{min-width:125px}
+    @media(max-width:540px){
+      .studio03-duration-row{gap:5px}
+      .studio03-duration-row label{font-size:11px}
+      .studio03-duration-row .icon-tool{flex-basis:37px;min-width:37px;padding-inline:5px}
+      .studio03-duration-row #studio03-duration{flex-basis:56px;min-width:56px;width:56px!important}
+      .controls-row{gap:7px}
+      .acronym-desc strong,.acronym-desc span{font-size:.75rem}
+    }
+
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1276,8 +1311,8 @@
         <!-- Lot 03 : gestion des étapes et des projets, sans modifier SEQUENCES. -->
         <section id="studio03" class="studio03" hidden aria-label="Studio de séquences animées">
           <div class="studio03-bar">
-            <strong>🎬 Studio de création</strong>
-            <input id="studio03-name" class="studio03-name" maxlength="80" aria-label="Nom de la séquence créée" placeholder="Nouvelle animation">
+            <strong>🎬 Studio</strong>
+            <input id="studio03-name" class="studio03-name" maxlength="80" aria-label="Nom de la séquence créée" placeholder="Nouvelle anim">
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03New()" aria-label="Nouvelle animation" title="Nouvelle animation">✚</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Save()" aria-label="Enregistrer l’animation" title="Enregistrer l’animation">💾</button>
           </div>
@@ -1295,7 +1330,7 @@
           <div class="studio03-bar studio03-duration-row">
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03AddStep()" aria-label="Ajouter une étape" title="Ajouter une étape">✚</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03DeleteStep()" aria-label="Supprimer l’étape" title="Supprimer l’étape">🗑</button>
-            <label for="studio03-duration">Transition depuis l’étape précédente (secondes)</label>
+            <label for="studio03-duration" title="Durée de transition depuis l’étape précédente, en secondes">Transition (s)</label>
             <input id="studio03-duration" type="number" inputmode="decimal" min="0.2" max="60" step="0.5" value="3" style="width:80px" onchange="studio03SetDuration(this.value)">
           </div>
           <div class="studio03-bar studio03-time-row">
@@ -1411,8 +1446,7 @@
         <!-- Live Voice-Over Subtitle / Teleprompter -->
         <div class="subtitle-well" aria-live="polite">
           <div class="subtitle-meta">
-            <span class="data-label" id="subtitle-phase-label">Phase 1 · Voix-off pédagogique</span>
-            <span class="voice-status-badge" id="voice-status-badge">Voix-off prête</span>
+            <span class="data-label" id="subtitle-phase-label">Phase 1 · Placement initial</span>
           </div>
           <p class="subtitle-text" id="subtitle-text">Appuie sur Lecture pour lancer l’animation.</p>
         </div>
@@ -1504,7 +1538,7 @@
             <ul class="keypoints-list" id="keypoints-list"></ul>
           </div>
 
-          <div class="nuance-box" id="nuance-box"></div>
+          <!-- Cadre méthodologique masqué en R5 ; texte conservé dans les données -->
         </div>
 
         <!-- Tab 2: Interactive Player Role Inspector -->
@@ -3518,7 +3552,7 @@
       if(!state.freeboardMode)await toggleFreeboard(true);
       state.studio03IgnoreFreePersist=false;
       const base=freeSnapshot();
-      state.studio03Project=studio03NewProject('Nouvelle animation',base);
+      state.studio03Project=studio03NewProject('Nouvelle anim',base);
       state.studio03Mode=true;state.studio03Step=0;
       const section=document.getElementById('studio03');section.hidden=false;
       document.getElementById('btn-mode-studio03')?.setAttribute('aria-pressed','true');
@@ -3530,7 +3564,7 @@
       if(!state.studio03Mode)return;
       studio03StopPreview();
       if(!confirm('Créer une nouvelle animation ? Les changements non enregistrés pourront être retrouvés dans la sauvegarde automatique tant qu’ils ne sont pas remplacés. Exporte-les pour les conserver.'))return;
-      const base=freeSnapshot();state.studio03Project=studio03NewProject('Nouvelle animation',base);state.studio03Step=0;
+      const base=freeSnapshot();state.studio03Project=studio03NewProject('Nouvelle anim',base);state.studio03Step=0;
       document.getElementById('studio03-name').value=state.studio03Project.name;
       state.freeHistory=[];state.freeRedo=[];studio03QueueAutosave();studio03RenderSteps();
     }
@@ -3833,7 +3867,6 @@
           card.className = `verbatim-card`;
           card.innerHTML = `
             <p class="verbatim-quote">${v.quote}</p>
-            <span class="verbatim-origin">${v.origin}</span>
           `;
           vList.appendChild(card);
         });
@@ -3846,6 +3879,7 @@
         seq.keypoints.forEach(kp => {
           const li = document.createElement(`li`);
           li.innerHTML = kp;
+          li.title = li.textContent.trim();
           kpList.appendChild(li);
         });
       }
@@ -4135,6 +4169,7 @@
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && state.isPlaying) pausePlayback();
     });
+    document.querySelectorAll('.acronym-desc').forEach(el => { el.title = el.textContent.trim().replace(/\s+/g,' '); });
     initApp();
     async function verifyOfflineAudio() {
       const status = document.getElementById('offline-status');
@@ -4145,7 +4180,7 @@
       }
       try {
         const manifest = await fetch('./narrations.json').then(r => r.json());
-        const cache = await caches.open('ardoise-augustin-autonome-v5-lot03-r4');
+        const cache = await caches.open('ardoise-augustin-autonome-v5-lot03-r5');
         let ready = 0;
         for (const item of manifest.items) {
           if (await cache.match('./' + item.file)) ready++;
