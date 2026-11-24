@@ -1059,6 +1059,21 @@
     #layer-free-marks [data-mark-index] { pointer-events:visibleStroke; cursor:pointer; }
     #layer-opponents .free-opponent, #layer-ball.free-ball { cursor:grab; touch-action:none; }
     #pitch-svg.freeboard-drawing { cursor:crosshair; }
+    /* Lot 03 : Studio visuel, isole des animations originales. */
+    .studio03 { margin:12px 0; padding:14px; border:1px solid var(--primary); border-radius:12px; background:var(--surface-container); }
+    .studio03[hidden], .studio03 [hidden] {display:none!important}
+    .studio03-bar {display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+    .studio03 input,.studio03 select {font:inherit; color:var(--on-surface); background:var(--surface-container-high); border:1px solid var(--outline); border-radius:8px; padding:8px; min-height:42px; max-width:100%;}
+    .studio03 .studio03-name {flex:1 1 190px;min-width:140px}
+    .studio03 .freeboard-tool {min-height:42px}
+    .studio03-steps {display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:thin}
+    .studio03-step {flex:0 0 auto;min-width:112px;padding:10px; border:1px solid var(--outline);border-radius:10px;background:var(--surface-container-high);color:var(--on-surface);text-align:left;font:inherit;cursor:pointer}
+    .studio03-step[aria-current="step"]{outline:2px solid var(--primary);background:var(--primary-container)}
+    .studio03-step small{display:block;color:var(--on-surface-variant);font-size:11px;margin-top:4px}
+    .studio03-info {color:var(--on-surface-variant);font-size:12px;line-height:1.5;margin:5px 0}
+    .studio03-feedback {min-height:20px;font-size:12px;color:var(--tertiary)}
+    .studio03-preview .pitch-svg{pointer-events:none}
+
     #freeboard-feedback { font-size:12px; min-height:18px; color:var(--tertiary); }
 
   </style>
@@ -1117,6 +1132,7 @@
             <button type="button" class="toggle-chip" id="btn-layer-vectors" aria-pressed="true" onclick="toggleLayer('vectors')">Vecteurs &amp; Triangles</button>
             <button type="button" class="toggle-chip" id="btn-layer-opponents" aria-pressed="true" onclick="toggleLayer('opponents')">Bloc adverse</button>
             <button type="button" class="toggle-chip mode-free" id="btn-mode-free" aria-pressed="false" onclick="toggleFreeboard()">Ardoise libre</button>
+            <button type="button" class="toggle-chip" id="btn-mode-studio03" aria-pressed="false" onclick="studio03Toggle()">🎬 Studio</button>
           </div>
         </div>
 
@@ -1160,6 +1176,39 @@
           </div>
           <p class="freeboard-help">Déplace les joueurs des deux équipes ou le ballon. Pour tracer, choisis un outil puis dessine sur le terrain. Sauvegarde automatique locale par séquence ; export conseillé pour conserver une copie durable.</p>
           <div id="freeboard-feedback" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- Lot 03 : gestion des étapes et des projets, sans modifier SEQUENCES. -->
+        <section id="studio03" class="studio03" hidden aria-label="Studio de séquences animées">
+          <div class="studio03-bar">
+            <strong>🎬 Studio de création</strong>
+            <input id="studio03-name" class="studio03-name" maxlength="80" aria-label="Nom de la séquence créée" placeholder="Nom de la séquence">
+            <button class="freeboard-tool" type="button" onclick="studio03New()">+ Nouvelle</button>
+            <button class="freeboard-tool" type="button" onclick="studio03Save()">💾 Enregistrer</button>
+          </div>
+          <div class="studio03-bar">
+            <label for="studio03-saved">Mes animations</label>
+            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Choisir…</option></select>
+            <button class="freeboard-tool" type="button" onclick="studio03Load()">Charger</button>
+            <button class="freeboard-tool" type="button" onclick="studio03Delete()">Supprimer</button>
+            <button class="freeboard-tool" type="button" onclick="studio03Export()">Exporter JSON</button>
+            <button class="freeboard-tool" type="button" onclick="document.getElementById('studio03-import').click()">Importer JSON</button>
+            <input type="file" id="studio03-import" accept=".json,application/json" hidden onchange="studio03Import(event)">
+          </div>
+          <div id="studio03-steps" class="studio03-steps" role="group" aria-label="Étapes de l'animation"></div>
+          <div class="studio03-bar">
+            <button class="freeboard-tool" type="button" onclick="studio03AddStep()">+ Ajouter une étape</button>
+            <button class="freeboard-tool" type="button" onclick="studio03DeleteStep()">Supprimer l’étape</button>
+            <label for="studio03-duration">Transition depuis l’étape précédente (secondes)</label>
+            <input id="studio03-duration" type="number" inputmode="decimal" min="0.2" max="60" step="0.5" value="3" style="width:80px" onchange="studio03SetDuration(this.value)">
+          </div>
+          <div class="studio03-bar">
+            <button class="freeboard-tool" type="button" id="studio03-play" onclick="studio03Preview()">▶ Prévisualiser</button>
+            <button class="freeboard-tool" type="button" onclick="studio03StopPreview()">■ Arrêter</button>
+            <span id="studio03-time" aria-live="off">00:00 / 00:00</span>
+          </div>
+          <p class="studio03-info">Déplace les joueurs ou le ballon, puis ajoute une étape et modifie les nouveaux placements. Les déplacements sont interpolés automatiquement. Les flèches et tracés sont associés à chaque étape. Le Studio est distinct des 9 séquences d’origine. La prévisualisation est muette : les narrations Augustin existantes ne sont pas modifiées.</p>
+          <p class="studio03-feedback" id="studio03-feedback" role="status" aria-live="polite"></p>
         </section>
 
         <div class="pitch-stage">
@@ -2358,6 +2407,16 @@
       freeRedo: [],
       freeGesture: null,
       freeRestoring: false,
+      studio03Mode: false,
+      studio03Previewing: false,
+      studio03PreviewFrame: null,
+      studio03PreviewMarks: null,
+      studio03Project: null,
+      studio03Step: 0,
+      studio03Raf: null,
+      studio03StartTime: 0,
+      studio03AutosaveTimer: null,
+      studio03IgnoreFreePersist: false,
       draggingId: null,
       selectedRoleId: `M6`,
       activeDossierTab: `tactics`,
@@ -2818,12 +2877,13 @@
 
     function renderPitch() {
       const seq = getCurrentSeq();
-      const frame = getInterpolatedFrame(seq, state.progress);
+      const frame = state.studio03Mode && state.studio03Previewing && state.studio03PreviewFrame ? state.studio03PreviewFrame : getInterpolatedFrame(seq, state.progress);
       if (!frame) return;
+      const editingFreeboard = state.freeboardMode && !state.studio03Previewing;
 
-      const activePlayers = state.freeboardMode && state.freePositions ? state.freePositions : frame.players;
-      const activeOpponents = state.freeboardMode && state.freeOpponents ? state.freeOpponents : frame.opp;
-      const activeBall = state.freeboardMode && state.freeBall ? state.freeBall : frame.ball;
+      const activePlayers = editingFreeboard && state.freePositions ? state.freePositions : frame.players;
+      const activeOpponents = editingFreeboard && state.freeOpponents ? state.freeOpponents : frame.opp;
+      const activeBall = editingFreeboard && state.freeBall ? state.freeBall : frame.ball;
 
       const zonesLayer = document.getElementById(`layer-zones`);
       if (zonesLayer) zonesLayer.style.display = state.layers.zones ? `block` : `none`;
@@ -3019,6 +3079,7 @@
     }
 
     function startPlayback() {
+      if(state.studio03Mode)studio03Exit();
       primeMobileAudio();
       if (state.freeboardMode) toggleFreeboard(false);
       state.playbackEpoch++;
@@ -3187,7 +3248,9 @@
     function tellFreeboard(message){const el=document.getElementById('freeboard-feedback');if(el)el.textContent=message;}
     function rememberFreeEdit(){state.freeHistory.push(freeSnapshot());if(state.freeHistory.length>80)state.freeHistory.shift();state.freeRedo=[];}
     async function persistFreeboard(){
+      if(state.studio03IgnoreFreePersist){state.studio03IgnoreFreePersist=false;return;}
       if(!state.freeboardMode||!state.freePositions)return;
+      if(state.studio03Mode){ studio03QueueAutosave(); return; }
       try{await freeStore('put','auto:'+state.currentSeqIndex,freeSnapshot());tellFreeboard('Composition sauvegardée automatiquement sur cet appareil.');}
       catch(e){tellFreeboard('Sauvegarde locale indisponible : utilise Exporter JSON.');}
     }
@@ -3203,6 +3266,7 @@
     }
     async function toggleFreeboard(forceVal){
       const next=typeof forceVal==='boolean'?forceVal:!state.freeboardMode;
+      if(!next && state.studio03Mode)studio03Exit();
       if(next===state.freeboardMode)return;
       if(state.freeboardMode&& !next)await persistFreeboard();
       state.freeboardMode=next;state.freeGesture=null;state.draggingId=null;
@@ -3226,7 +3290,7 @@
       return [Math.round(clamp(local.x,55,845)*10)/10,Math.round(clamp(local.y,50,490)*10)/10];
     }
     function onFreeObjectDown(ev,kind,id){
-      if(!state.freeboardMode||state.freeTool!=='move')return;
+      if(!state.freeboardMode||state.freeTool!=='move'||state.studio03Previewing)return;
       ev.preventDefault();ev.stopPropagation();rememberFreeEdit();
       state.freeGesture={kind,id,pointerId:ev.pointerId,changed:false};
       if(kind==='team')selectRole(id,false);
@@ -3235,7 +3299,8 @@
     function renderFreeMarks(){
       const layer=document.getElementById('layer-free-marks');if(!layer)return;layer.replaceChildren();
       if(!state.freeboardMode)return;
-      state.freeMarks.forEach((mark,i)=>{
+      const marks=(state.studio03Previewing&&state.studio03PreviewMarks)?state.studio03PreviewMarks:state.freeMarks;
+      marks.forEach((mark,i)=>{
         if(!mark.points||mark.points.length<2)return;
         const attrs={points:mark.points.map(p=>p.join(',')).join(' '),fill:'none',stroke:mark.type==='arrow'?'#f9df76':'#ffffff','stroke-width':mark.type==='pen'?3.5:3,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
         if(mark.type==='arrow')attrs['marker-end']='url(#arrow-warn)';
@@ -3243,7 +3308,7 @@
       });
     }
     document.getElementById('pitch-svg')?.addEventListener('pointerdown',ev=>{
-      if(!state.freeboardMode||state.freeTool==='move')return;
+      if(!state.freeboardMode||state.freeTool==='move'||state.studio03Previewing)return;
       ev.preventDefault();ev.stopPropagation();
       const markTarget=ev.target.closest?.('[data-mark-index]');
       if(state.freeTool==='erase'){
@@ -3258,7 +3323,7 @@
       renderFreeMarks();
     },true);
     window.addEventListener('pointermove',ev=>{
-      if(!state.freeboardMode||!state.freeGesture||state.freeGesture.pointerId!==ev.pointerId)return;
+      if(!state.freeboardMode||state.studio03Previewing||!state.freeGesture||state.freeGesture.pointerId!==ev.pointerId)return;
       const g=state.freeGesture,point=clientToSvgCoords(ev.clientX,ev.clientY);g.changed=true;
       if(g.kind==='team'&&state.freePositions)state.freePositions[g.id]=point;
       else if(g.kind==='opponent'&&state.freeOpponents)state.freeOpponents[g.id]=point;
@@ -3322,6 +3387,199 @@
       }catch(e){tellFreeboard('Import impossible : '+e.message)}finally{event.target.value=''}
     }
 
+    /* LOT 03 — Éditeur de séquences, totalement séparé de SEQUENCES et des 28 narrations. */
+    const STUDIO03_PREFIX='studio03:';
+    function studio03Notice(message){const el=document.getElementById('studio03-feedback');if(el)el.textContent=message;}
+    function studio03Copy(v){return JSON.parse(JSON.stringify(v));}
+    function studio03NewProject(name,snapshot){return {type:'ardoise-v5-studio',schema:1,name:String(name||'Nouvelle animation').slice(0,80),createdAt:new Date().toISOString(),steps:[{duration:0,snapshot:studio03Copy(snapshot)}]};}
+    function studio03Valid(project){
+      return !!(project&&project.type==='ardoise-v5-studio'&&project.schema===1&&typeof project.name==='string'&&project.name.length<=80&&Array.isArray(project.steps)&&project.steps.length>=1&&project.steps.length<=100&&project.steps.every((step,i)=>step&&typeof step.duration==='number'&&Number.isFinite(step.duration)&&(i===0?step.duration===0:step.duration>=.2&&step.duration<=60)&&isValidFreeboard(step.snapshot)));
+    }
+    function studio03Capture(){
+      if(!state.studio03Mode||!state.studio03Project||state.studio03Previewing)return;
+      state.studio03Project.steps[state.studio03Step].snapshot=freeSnapshot();
+    }
+    function studio03QueueAutosave(){
+      if(!state.studio03Mode||!state.studio03Project||state.studio03Previewing)return;
+      studio03Capture();
+      if(state.studio03AutosaveTimer)clearTimeout(state.studio03AutosaveTimer);
+      state.studio03AutosaveTimer=setTimeout(async()=>{state.studio03AutosaveTimer=null;try{await freeStore('put',STUDIO03_PREFIX+'auto',studio03Copy(state.studio03Project));}catch(e){studio03Notice('Sauvegarde automatique indisponible. Exporte ton animation JSON.')}},400);
+    }
+    function studio03Exit(){
+      if(!state.studio03Mode)return;
+      studio03StopPreview(false);
+      studio03Capture();
+      const project=state.studio03Project;
+      state.studio03Mode=false;state.studio03Previewing=false;
+      /* Ne jamais écraser l'ardoise libre du lot 02 en quittant le Studio. */
+      state.studio03IgnoreFreePersist=true;
+      if(state.studio03AutosaveTimer){clearTimeout(state.studio03AutosaveTimer);state.studio03AutosaveTimer=null;}
+      if(project)freeStore('put',STUDIO03_PREFIX+'auto',studio03Copy(project)).catch(()=>{});
+      document.getElementById('studio03').hidden=true;
+      document.getElementById('btn-mode-studio03')?.setAttribute('aria-pressed','false');
+      document.querySelector('.player-panel')?.classList.remove('studio03-preview');
+    }
+    async function studio03Toggle(){
+      if(state.studio03Mode){studio03Exit();await toggleFreeboard(false);return;}
+      pausePlayback();
+      if(!state.freeboardMode)await toggleFreeboard(true);
+      state.studio03IgnoreFreePersist=false;
+      const base=freeSnapshot();
+      state.studio03Project=studio03NewProject('Nouvelle animation',base);
+      state.studio03Mode=true;state.studio03Step=0;
+      const section=document.getElementById('studio03');section.hidden=false;
+      document.getElementById('btn-mode-studio03')?.setAttribute('aria-pressed','true');
+      document.getElementById('studio03-name').value=state.studio03Project.name;
+      try{const auto=await freeStore('get',STUDIO03_PREFIX+'auto');if(state.studio03Mode&&studio03Valid(auto)){state.studio03Project=auto;state.studio03Step=auto.steps.length-1;applyFreeSnapshot(auto.steps[state.studio03Step].snapshot);document.getElementById('studio03-name').value=auto.name;}}catch(_){}
+      await studio03RefreshProjects();studio03RenderSteps();studio03Notice('Studio actif. Modifie les positions puis ajoute une étape.');
+    }
+    function studio03New(){
+      if(!state.studio03Mode)return;
+      studio03StopPreview();
+      if(!confirm('Créer une nouvelle animation ? Les changements non enregistrés pourront être retrouvés dans la sauvegarde automatique tant qu’ils ne sont pas remplacés. Exporte-les pour les conserver.'))return;
+      const base=freeSnapshot();state.studio03Project=studio03NewProject('Nouvelle animation',base);state.studio03Step=0;
+      document.getElementById('studio03-name').value=state.studio03Project.name;
+      state.freeHistory=[];state.freeRedo=[];studio03QueueAutosave();studio03RenderSteps();
+    }
+    function studio03RenderSteps(){
+      if(!state.studio03Mode||!state.studio03Project)return;
+      const wrap=document.getElementById('studio03-steps');wrap.replaceChildren();
+      state.studio03Project.steps.forEach((s,i)=>{
+        const button=document.createElement('button');button.type='button';button.className='studio03-step';button.setAttribute('aria-current',i===state.studio03Step?'step':'false');
+        button.innerHTML='<strong>Étape '+(i+1)+'</strong><small>'+(i===0?'Départ':Number(s.duration).toFixed(1)+' s')+'</small>';
+        button.addEventListener('click',()=>studio03SelectStep(i));wrap.appendChild(button);
+      });
+      const duration=document.getElementById('studio03-duration');duration.disabled=state.studio03Step===0;duration.value=state.studio03Project.steps[state.studio03Step].duration||3;
+      const total=state.studio03Project.steps.reduce((sum,x)=>sum+x.duration,0);
+      document.getElementById('studio03-time').textContent='00:00 / '+formatTime(total);
+    }
+    function studio03SelectStep(index){
+      if(!state.studio03Mode||!state.studio03Project||index<0||index>=state.studio03Project.steps.length)return;
+      studio03StopPreview();studio03Capture();state.studio03Step=index;
+      applyFreeSnapshot(state.studio03Project.steps[index].snapshot);
+      state.freeHistory=[];state.freeRedo=[];studio03RenderSteps();studio03QueueAutosave();
+    }
+    function studio03AddStep(){
+      if(!state.studio03Mode||!state.studio03Project)return;
+      studio03StopPreview();studio03Capture();
+      if(state.studio03Project.steps.length>=100){studio03Notice('Limite : 100 étapes par animation.');return;}
+      const index=state.studio03Step+1;
+      state.studio03Project.steps.splice(index,0,{duration:3,snapshot:freeSnapshot()});
+      state.studio03Step=index;state.freeHistory=[];state.freeRedo=[];studio03RenderSteps();studio03QueueAutosave();
+      studio03Notice('Étape '+(index+1)+' créée. Déplace les joueurs ou le ballon pour préparer la transition.');
+    }
+    function studio03DeleteStep(){
+      if(!state.studio03Mode||!state.studio03Project)return;
+      studio03StopPreview();if(state.studio03Project.steps.length<=1){studio03Notice('Il faut conserver au moins une étape.');return;}
+      studio03Capture();const i=state.studio03Step;
+      state.studio03Project.steps.splice(i,1);
+      if(i===0)state.studio03Project.steps[0].duration=0;
+      state.studio03Step=Math.max(0,Math.min(i,state.studio03Project.steps.length-1));
+      applyFreeSnapshot(state.studio03Project.steps[state.studio03Step].snapshot);
+      state.freeHistory=[];state.freeRedo=[];studio03RenderSteps();studio03QueueAutosave();
+    }
+    function studio03SetDuration(value){
+      if(!state.studio03Mode||!state.studio03Project||state.studio03Step===0)return;
+      const seconds=Number(value);if(!Number.isFinite(seconds)){studio03Notice('Durée invalide.');return;}
+      state.studio03Project.steps[state.studio03Step].duration=Math.round(clamp(seconds,.2,60)*10)/10;
+      studio03RenderSteps();studio03QueueAutosave();
+    }
+    function studio03BuildFrame(elapsed){
+      const steps=state.studio03Project.steps;let spent=0;
+      if(steps.length===1)return {frame:studio03FromSnapshot(steps[0].snapshot),marks:steps[0].snapshot.marks};
+      for(let i=1;i<steps.length;i++){
+        const seconds=steps[i].duration;
+        if(elapsed<=spent+seconds || i===steps.length-1){
+          const a=steps[i-1].snapshot,b=steps[i].snapshot;
+          const f=easeInOutCubic(clamp((elapsed-spent)/seconds,0,1));
+          const mix=(p,q)=>[lerp(p[0],q[0],f),lerp(p[1],q[1],f)];
+          const players={};TOKEN_META.forEach(t=>{players[t.id]=mix(a.players[t.id],b.players[t.id]);});
+          const opp=b.opponents.map((p,k)=>a.opponents[k]?mix(a.opponents[k],p):p.slice());
+          return {frame:{players,opp,ball:mix(a.ball,b.ball),guides:[]},marks:f<.5?a.marks:b.marks};
+        }
+        spent+=seconds;
+      }
+      return {frame:studio03FromSnapshot(steps[steps.length-1].snapshot),marks:steps[steps.length-1].snapshot.marks};
+    }
+    function studio03FromSnapshot(s){return {players:s.players,opp:s.opponents,ball:s.ball,guides:[]}}
+    function studio03Preview(){
+      if(!state.studio03Mode||!state.studio03Project)return;
+      studio03StopPreview();studio03Capture();
+      const total=state.studio03Project.steps.reduce((sum,x)=>sum+x.duration,0);
+      if(total<=0){studio03Notice('Ajoute une étape pour créer une animation.');return;}
+      state.studio03Previewing=true;state.studio03StartTime=performance.now();
+      document.querySelector('.player-panel')?.classList.add('studio03-preview');
+      const frame=(now)=>{
+        if(!state.studio03Previewing)return;
+        const elapsed=Math.min(total,(now-state.studio03StartTime)/1000);
+        const result=studio03BuildFrame(elapsed);state.studio03PreviewFrame=result.frame;state.studio03PreviewMarks=result.marks;
+        renderPitch();document.getElementById('studio03-time').textContent=formatTime(elapsed)+' / '+formatTime(total);
+        if(elapsed>=total){studio03StopPreview();studio03Notice('Prévisualisation terminée.');return;}
+        state.studio03Raf=requestAnimationFrame(frame);
+      };
+      state.studio03Raf=requestAnimationFrame(frame);
+    }
+    function studio03StopPreview(redraw=true){
+      if(state.studio03Raf)cancelAnimationFrame(state.studio03Raf);
+      state.studio03Raf=null;state.studio03Previewing=false;state.studio03PreviewFrame=null;state.studio03PreviewMarks=null;
+      document.querySelector('.player-panel')?.classList.remove('studio03-preview');
+      if(redraw&&state.studio03Mode){renderPitch();studio03RenderSteps();}
+    }
+    async function studio03RefreshProjects(){
+      const sel=document.getElementById('studio03-saved');if(!sel)return;
+      const selected=sel.value;sel.replaceChildren(new Option('Mes animations…',''));
+      try{const keys=(await freeStore('keys')).filter(x=>typeof x==='string'&&x.startsWith(STUDIO03_PREFIX+'saved:')).sort();
+        keys.forEach(k=>sel.add(new Option(k.slice((STUDIO03_PREFIX+'saved:').length),k)));
+        if(keys.includes(selected))sel.value=selected;
+      }catch(e){studio03Notice('Stockage local indisponible : utilise Exporter JSON.');}
+    }
+    async function studio03Save(){
+      if(!state.studio03Mode||!state.studio03Project)return;
+      studio03StopPreview();studio03Capture();
+      const name=(document.getElementById('studio03-name').value||'').trim().slice(0,80);
+      if(!name){studio03Notice('Indique un nom pour enregistrer.');return;}
+      state.studio03Project.name=name;
+      if(!studio03Valid(state.studio03Project)){studio03Notice('Animation invalide : impossible à sauvegarder.');return;}
+      try{const key=STUDIO03_PREFIX+'saved:'+name;await freeStore('put',key,studio03Copy(state.studio03Project));await freeStore('put',STUDIO03_PREFIX+'auto',studio03Copy(state.studio03Project));await studio03RefreshProjects();document.getElementById('studio03-saved').value=key;studio03Notice('Animation « '+name+' » sauvegardée sur cet appareil. Exporte un JSON pour en conserver une copie durable.');}
+      catch(e){studio03Notice('Sauvegarde impossible. Exporte le fichier JSON.');}
+    }
+    async function studio03Load(){
+      if(!state.studio03Mode)return;
+      const key=document.getElementById('studio03-saved').value;if(!key){studio03Notice('Sélectionne une animation.');return;}
+      studio03StopPreview();
+      try{const project=await freeStore('get',key);if(!studio03Valid(project))throw Error('Format incompatible');
+        state.studio03Project=studio03Copy(project);state.studio03Step=0;applyFreeSnapshot(project.steps[0].snapshot);
+        document.getElementById('studio03-name').value=project.name;
+        state.freeHistory=[];state.freeRedo=[];studio03RenderSteps();studio03QueueAutosave();studio03Notice('Animation chargée.');
+      }catch(e){studio03Notice('Impossible de charger cette animation.');}
+    }
+    async function studio03Delete(){
+      const sel=document.getElementById('studio03-saved'),key=sel?.value;if(!key)return;
+      if(!confirm('Supprimer l’animation enregistrée « '+sel.selectedOptions[0]?.textContent+' » ?'))return;
+      try{await freeStore('delete',key);await studio03RefreshProjects();studio03Notice('Animation enregistrée supprimée.');}
+      catch(e){studio03Notice('Suppression impossible.');}
+    }
+    function studio03Export(){
+      if(!state.studio03Mode||!state.studio03Project)return;
+      studio03StopPreview();studio03Capture();
+      state.studio03Project.name=(document.getElementById('studio03-name').value||'Animation').trim().slice(0,80);
+      if(!studio03Valid(state.studio03Project)){studio03Notice('Animation invalide.');return;}
+      const data=studio03Copy(state.studio03Project);
+      const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+      const a=document.createElement('a');a.href=url;a.download='ardoise-studio-'+Date.now()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+      studio03Notice('Animation exportée au format JSON.');
+    }
+    async function studio03Import(ev){
+      const file=ev.target.files?.[0];if(!file)return;
+      try{if(file.size>8_000_000)throw Error('Taille supérieure à 8 Mo');
+        const data=JSON.parse(await file.text());if(!studio03Valid(data))throw Error('Format ou coordonnées incompatibles');
+        if(!state.studio03Mode)await studio03Toggle();
+        studio03StopPreview();state.studio03Project=studio03Copy(data);state.studio03Step=0;
+        applyFreeSnapshot(data.steps[0].snapshot);document.getElementById('studio03-name').value=data.name;
+        state.freeHistory=[];state.freeRedo=[];studio03RenderSteps();studio03QueueAutosave();studio03Notice('Animation importée : enregistre-la sous un nom.');
+      }catch(e){studio03Notice('Import impossible : '+e.message);}finally{ev.target.value='';}
+    }
+
     /* Sequence Selection & UI Rendering */
     function selectSequence(index, autoPlay) {
       const wasPlaying = Boolean(autoPlay);
@@ -3329,6 +3587,7 @@
       state.currentSeqIndex = clamp(index, 0, SEQUENCES.length - 1);
       state.progress = 0;
       state.lastCueIndex = -1;
+      if (state.studio03Mode) studio03Exit();
       if (state.freeboardMode) persistFreeboard();
       state.freeboardMode = false;
       state.freePositions = null;
@@ -3739,7 +3998,7 @@
       }
       try {
         const manifest = await fetch('./narrations.json').then(r => r.json());
-        const cache = await caches.open('ardoise-augustin-autonome-v5-lot02');
+        const cache = await caches.open('ardoise-augustin-autonome-v5-lot03');
         let ready = 0;
         for (const item of manifest.items) {
           if (await cache.match('./' + item.file)) ready++;
