@@ -1029,14 +1029,21 @@
     .lot01-field { display:flex; flex-direction:column; gap:5px; min-width:130px; }
     .lot01-field label { font-size:11px; letter-spacing:.04em; font-weight:700; color:var(--on-surface-variant); }
     .lot01-select { color:var(--on-surface); background:var(--surface-container-high); border:1px solid var(--outline); border-radius:8px; padding:9px 10px; font:inherit; font-size:13px; min-height:40px; }
-    .lot01-palette { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
-    .lot01-swatch { width:28px; height:28px; padding:0; border:2px solid rgba(255,255,255,.42); border-radius:50%; background:var(--swatch); cursor:pointer; touch-action:manipulation; }
-    .lot01-swatch[aria-pressed="true"] { outline:2px solid var(--on-surface); outline-offset:2px; }
-    .lot01-swatch:focus-visible { outline:3px solid var(--primary); outline-offset:3px; }
-    #pitch-svg.is-vertical { aspect-ratio:540 / 900; width:min(100%, 550px); margin-left:auto; margin-right:auto; }
-    /* SVG text labels remain readable after rotating the complete field. */
-    #pitch-svg.is-vertical #pitch-content text { transform-box:fill-box; transform-origin:center; transform:rotate(-90deg); }
-    @media(max-width:650px) { .lot01-settings{gap:12px;padding:10px;} .lot01-field{min-width:105px;} #pitch-svg.is-vertical{width:100%;} }
+    .lot01-settings .lot01-field { flex:1 1 145px; min-width:0; }
+    .lot01-settings .lot01-select { width:100%; cursor:pointer; }
+    #pitch-svg.is-vertical { aspect-ratio:3 / 4; width:min(100%, 540px); margin-inline:auto; }
+    /* Labels created on moving tactical layers are kept horizontal. */
+    #pitch-svg.is-vertical #pitch-content #layer-tactical-guides text,
+    #pitch-svg.is-vertical #pitch-content #layer-hud text,
+    #pitch-svg.is-vertical #pitch-content #layer-team text,
+    #pitch-svg.is-vertical #pitch-content #layer-opponents text { transform-box:fill-box; transform-origin:center; transform:rotate(90deg); }
+    /* Static sideline captions have their own readable vertical-mode overlay. */
+    #pitch-svg.is-vertical #layer-zones > text,
+    #pitch-svg.is-vertical #pitch-lines > text { display:none; }
+    #vertical-pitch-annotations { display:none; pointer-events:none; font-family:var(--font-label); }
+    #pitch-svg.is-vertical #vertical-pitch-annotations { display:block; }
+    #vertical-pitch-annotations text { paint-order:stroke; stroke:var(--pitch-turf); stroke-width:4px; stroke-linejoin:round; font-weight:700; font-size:11px; }
+    @media(max-width:650px) { .lot01-settings{gap:9px;padding:10px;} .lot01-settings .lot01-field{flex-basis:calc(50% - 8px);} #pitch-svg.is-vertical{width:100%;} }
 
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
@@ -1107,9 +1114,9 @@
               <option value="vertical">Vertical</option>
             </select>
           </div>
-          <div class="lot01-field"><label>Notre équipe</label><div id="lot01-team" class="lot01-palette" role="group" aria-label="Couleur de notre équipe"></div></div>
-          <div class="lot01-field"><label>Adversaires</label><div id="lot01-opponent" class="lot01-palette" role="group" aria-label="Couleur des adversaires"></div></div>
-          <div class="lot01-field"><label>Gardien</label><div id="lot01-goalkeeper" class="lot01-palette" role="group" aria-label="Couleur du gardien"></div></div>
+          <div class="lot01-field"><label for="lot01-team">Notre équipe</label><select id="lot01-team" class="lot01-select" aria-label="Couleur de notre équipe" onchange="setPitchColor('team',this.value)"></select></div>
+          <div class="lot01-field"><label for="lot01-opponent">Adversaires</label><select id="lot01-opponent" class="lot01-select" aria-label="Couleur des adversaires" onchange="setPitchColor('opponent',this.value)"></select></div>
+          <div class="lot01-field"><label for="lot01-goalkeeper">Gardien</label><select id="lot01-goalkeeper" class="lot01-select" aria-label="Couleur du gardien" onchange="setPitchColor('goalkeeper',this.value)"></select></div>
         </div>
 
         <div class="pitch-stage">
@@ -1190,6 +1197,13 @@
             <!-- Dynamic On-Pitch Callout Badge -->
             <g id="layer-hud" aria-hidden="true"></g>
             </g><!-- pitch-content : all field layers share one transform -->
+            <g id="vertical-pitch-annotations" aria-hidden="true">
+              <text x="270" y="20" text-anchor="middle" fill="var(--on-surface-variant)">↑ SENS D’ATTAQUE</text>
+              <text x="20" y="145" text-anchor="start" fill="var(--warning)">Z3 · FINITION</text>
+              <text x="20" y="360" text-anchor="start" fill="var(--tertiary)">Z2 · MÉDIANE</text>
+              <text x="20" y="575" text-anchor="start" fill="var(--primary)">Z1 · RELANCE</text>
+              <text x="270" y="710" text-anchor="middle" fill="var(--on-surface-variant)">COULOIR GAUCHE / COULOIR DROIT</text>
+            </g>
           </svg>
 
           <div class="pitch-badge-bar">
@@ -2333,9 +2347,9 @@
       const group=document.getElementById('pitch-content');
       if (!svg || !group) return;
       const vertical = value==='vertical';
-      svg.setAttribute('viewBox',vertical?'0 0 540 900':'0 0 900 540');
+      svg.setAttribute('viewBox',vertical?'0 0 540 720':'0 0 900 540');
       svg.classList.toggle('is-vertical',vertical);
-      group.setAttribute('transform',vertical?'translate(540 0) rotate(90)':'');
+      group.setAttribute('transform',vertical?'translate(0 720) scale(1 0.8) rotate(-90)':'');
       const sel=document.getElementById('lot01-orientation');
       if (sel) sel.value=value;
       persistPitchPrefs();
@@ -2347,7 +2361,8 @@
       const root=document.documentElement.style;
       root.setProperty(prefix,PITCH_COLORS[value]);
       root.setProperty(prefix+'-ink',pitchInk(PITCH_COLORS[value]));
-      document.querySelectorAll('#lot01-'+which+' .lot01-swatch').forEach(el => el.setAttribute('aria-pressed',String(el.dataset.color===value)));
+      const chooser=document.getElementById('lot01-'+which);
+      if (chooser) { chooser.value=value; chooser.style.borderLeft='6px solid '+PITCH_COLORS[value]; }
       persistPitchPrefs();
     }
     function initPitchSettings() {
@@ -2358,17 +2373,14 @@
       } catch (_) { /* no saved preferences */ }
       const colors=['blue','white','red','green','yellow','cyan','coral','gold'];
       for (const which of ['team','opponent','goalkeeper']) {
-        const container=document.getElementById('lot01-'+which);
-        if (!container) continue;
+        const chooser=document.getElementById('lot01-'+which);
+        if (!chooser) continue;
+        chooser.replaceChildren();
         for (const c of colors) {
-          const btn=document.createElement('button');
-          btn.type='button'; btn.className='lot01-swatch'; btn.dataset.color=c;
-          btn.style.setProperty('--swatch',PITCH_COLORS[c]);
-          btn.setAttribute('aria-label',PITCH_COLOR_NAMES[c]);
-          btn.setAttribute('title',PITCH_COLOR_NAMES[c]);
-          btn.setAttribute('aria-pressed','false');
-          btn.addEventListener('click',()=>setPitchColor(which,c));
-          container.appendChild(btn);
+          const option=document.createElement('option');
+          option.value=c;
+          option.textContent=PITCH_COLOR_NAMES[c];
+          chooser.appendChild(option);
         }
         setPitchColor(which,pitchPrefs[which]);
       }
