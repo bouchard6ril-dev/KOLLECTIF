@@ -1,6 +1,6 @@
-// ARDOISE V2 : mise a jour du lecteur sans recreer inutilement les 28 WAV.
-const CACHE = 'ardoise-augustin-autonome-v5-lot03';
-const OLD = 'ardoise-augustin-autonome-v5-lot02';
+// KOLLECTIF R4 — affichage actualisé, 28 narrations conservées depuis le cache précédent.
+const CACHE = 'ardoise-augustin-autonome-v5-lot03-r4';
+const OLD = 'ardoise-augustin-autonome-v5-lot03';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './narrations.json'];
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

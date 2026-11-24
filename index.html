@@ -1068,7 +1068,7 @@
     .studio03 .freeboard-tool {min-height:42px}
     .studio03-steps {display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px 2px;scrollbar-width:thin}
     .studio03-step {flex:0 0 auto;min-width:112px;padding:10px; border:1px solid var(--outline);border-radius:10px;background:var(--surface-container-high);color:var(--on-surface);text-align:left;font:inherit;cursor:pointer;scroll-margin-left:8px}
-    .studio03-step[aria-current="step"]{outline:2px solid var(--primary);background:var(--primary-container)}
+    .studio03-step[aria-current="step"]{outline:none;box-shadow:inset 0 0 0 2px var(--primary);background:var(--primary-container)}
     .studio03-step small{display:block;color:var(--on-surface-variant);font-size:11px;margin-top:4px}
     .studio03-info {color:var(--on-surface-variant);font-size:12px;line-height:1.5;margin:5px 0}
     .studio03-feedback {min-height:20px;font-size:12px;color:var(--tertiary)}
@@ -1103,7 +1103,7 @@
     .icon-btn{min-width:52px;justify-content:center;padding-inline:12px}
     #btn-loop,#btn-voice{min-width:0;padding-inline:16px}
     #voice-label{min-width:2.4ch;text-align:center}
-    #loop-label{display:none}
+    #loop-label{display:inline-block;font-size:.78rem;font-weight:600}
     .icon-btn-wide{min-width:70px}
     .source-pill{border:var(--hairline);background:var(--surface-container-high);color:var(--tertiary);border-radius:999px;padding:8px 14px;cursor:help;font:inherit}
     .compact-sources{display:flex;justify-content:flex-end}
@@ -1140,6 +1140,45 @@
       .metric-chip{padding:6px 10px}
     }
 
+
+    /* KOLLECTIF R4: alignement des commandes et lisibilité */
+    .app-tagline[hidden]{display:none!important}
+    .header-lede{white-space:nowrap;overflow:visible;text-overflow:clip;font-size:clamp(.75rem,.85vw,.95rem)}
+    .studio03,.freeboard-studio{min-width:0;box-sizing:border-box}
+    .studio03-bar{min-width:0;gap:7px}
+    .studio03 .studio03-name{flex:1 1 220px;min-width:135px;width:auto}
+    .studio03-select-row{flex-wrap:nowrap;gap:7px}
+    .studio03-select-row select{flex:1 1 160px;min-width:125px;width:0}
+    .studio03-select-row .icon-tool{flex:0 0 42px}
+    .studio03-duration-row{flex-wrap:nowrap;gap:7px}
+    .studio03-duration-row label{min-width:0;max-width:100%;font-size:clamp(.72rem,.95vw,.88rem);line-height:1.2}
+    .studio03-duration-row #studio03-duration{width:66px!important;min-width:66px;flex:0 0 66px}
+    .studio03-time-row{flex-wrap:nowrap;gap:7px}
+    .studio03-steps{padding-left:4px;padding-right:4px;scroll-padding-left:4px}
+    .studio03-step[aria-current="step"]{outline:none!important;box-shadow:inset 0 0 0 2px var(--primary)!important}
+    .freeboard-studio .freeboard-tools{gap:6px}
+    #voice-select-wrap,#voice-select{min-width:190px}
+    #btn-loop,#btn-voice{padding-inline:11px;min-height:44px;white-space:nowrap}
+    .controls-row{gap:9px}
+    .controls-group{gap:8px}
+    .filter-stack{justify-content:flex-start}
+    .filter-stack .field-label{white-space:nowrap}
+    @media(min-width:1100px){
+      .studio03-select-row,.studio03-duration-row,.studio03-time-row{flex-wrap:nowrap}
+      .studio03-duration-row label{white-space:nowrap}
+    }
+    @media(max-width:1099px){
+      .studio03-select-row,.studio03-duration-row{flex-wrap:wrap}
+      .studio03-select-row select{flex:1 1 190px;width:auto}
+      .studio03-duration-row label{white-space:normal}
+    }
+    @media(max-width:520px){
+      .studio03 .studio03-name{flex:1 1 140px}
+      .studio03-select-row .icon-tool{flex-basis:42px}
+      .controls-group{gap:6px}
+      #voice-select-wrap,#voice-select{min-width:150px}
+    }
+
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1150,7 +1189,7 @@
       <div>
         <span class="data-label app-tagline" hidden>Football à 8 · Catégorie U12/U13 · Formation d’éducateurs</span>
         <h1 class="header-title">KOLLECTIF</h1>
-        <p class="header-lede compact-note">Atelier interactif 2-4-1 : animation collective, ardoise libre et studio de création pour préparer, expliquer et faire vivre les séquences tactiques.</p>
+        <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
@@ -1243,7 +1282,7 @@
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Save()" aria-label="Enregistrer l’animation" title="Enregistrer l’animation">💾</button>
           </div>
           <div class="studio03-bar studio03-select-row">
-            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Mes compos</option></select>
+            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Mes animes</option></select>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Load()" aria-label="Charger l’animation" title="Charger l’animation">📂</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Delete()" aria-label="Supprimer l’animation" title="Supprimer l’animation">🗑</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Export()" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
@@ -1415,12 +1454,12 @@
                 </select>
               </div>
 
-              <button type="button" class="btn" id="btn-loop" aria-pressed="true" onclick="toggleLoop()">
+              <button type="button" class="btn" id="btn-loop" aria-pressed="true" onclick="toggleLoop()" title="Changer le mode de boucle" aria-label="Changer le mode de boucle">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
                 <span id="loop-label">Séq.</span>
               </button>
 
-              <button type="button" class="btn btn-active" id="btn-voice" aria-pressed="true" onclick="toggleVoice()">
+              <button type="button" class="btn btn-active" id="btn-voice" aria-pressed="true" onclick="toggleVoice()" title="Activer ou couper la voix" aria-label="Activer ou couper la voix">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
                 <span id="voice-label">ON</span>
               </button>
@@ -3581,7 +3620,7 @@
     }
     async function studio03RefreshProjects(){
       const sel=document.getElementById('studio03-saved');if(!sel)return;
-      const selected=sel.value;sel.replaceChildren(new Option('Mes compos',''));
+      const selected=sel.value;sel.replaceChildren(new Option('Mes animes',''));
       try{const keys=(await freeStore('keys')).filter(x=>typeof x==='string'&&x.startsWith(STUDIO03_PREFIX+'saved:')).sort();
         keys.forEach(k=>sel.add(new Option(k.slice((STUDIO03_PREFIX+'saved:').length),k)));
         if(keys.includes(selected))sel.value=selected;
@@ -4106,7 +4145,7 @@
       }
       try {
         const manifest = await fetch('./narrations.json').then(r => r.json());
-        const cache = await caches.open('ardoise-augustin-autonome-v5-lot03');
+        const cache = await caches.open('ardoise-augustin-autonome-v5-lot03-r4');
         let ready = 0;
         for (const item of manifest.items) {
           if (await cache.match('./' + item.file)) ready++;
