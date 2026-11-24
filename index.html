@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="./icon-180.png">
   <meta name="artifact-type" content="tool">
   <meta name="design-style" content="aurora">
-  <title>KOLLECTIF — Animation tactique 2-4-1</title>
+  <title>KOLLECTIF — Tactiques Football</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1240,7 +1240,34 @@
     #free-line-shape{min-width:140px}
     #layer-free-marks [data-mark-index]{pointer-events:visibleStroke;cursor:crosshair}
     #layer-free-marks [data-point-index]{pointer-events:all!important;cursor:grab}
-  </style>
+  
+  /* KOLLECTIF · Identité visuelle approuvée · LAB */
+  .ko-wordmark{display:flex;align-items:center;gap:0;font-size:clamp(1.6rem,3.1vw,2.45rem);font-weight:800;font-style:italic;letter-spacing:.065em;color:#f3f4fa;text-shadow:0 2px 14px rgba(15,226,241,.18)}
+  .ko-wordmark img{height:1.32em;width:1.18em;object-fit:contain;margin-right:-.08em;flex:none;filter:drop-shadow(0 0 6px rgba(29,222,238,.28))}
+  .ko-tool{padding:2px!important;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;min-width:42px;min-height:42px;vertical-align:middle;line-height:1}
+  .ko-tool .ko-symbol{width:40px;height:40px;display:block;object-fit:cover;border-radius:8px;pointer-events:none;user-select:none}
+  .ko-tool[aria-pressed="true"]{outline:2px solid var(--primary);outline-offset:1px}
+  .ko-tool:focus-visible{outline:3px solid #4dddf0;outline-offset:2px}
+  .ko-tool:disabled{opacity:.4}
+  @media(max-width:520px){.ko-wordmark{font-size:1.5rem}.ko-tool .ko-symbol{width:36px;height:36px}}
+
+  
+  /* KOLLECTIF — Planche 3 approuvée · Or lumineux / argent · LAB 2026-11-24 */
+  :root{--ko-gold:#e6b854;--ko-gold-bright:#ffe2a0;--ko-gold-dim:#8f6b29}
+  body{background:radial-gradient(ellipse 85% 28% at 50% 0%,rgba(166,118,31,.12),transparent 80%),var(--surface);}
+  .ko-wordmark{letter-spacing:.072em;color:#e7e8ec;text-shadow:0 1px 0 rgba(255,255,255,.17),0 6px 20px rgba(234,173,58,.13)}
+  .ko-wordmark img{filter:drop-shadow(0 0 8px rgba(244,181,53,.35))}
+  .app-version{color:var(--ko-gold-bright)!important;border-color:rgba(229,181,84,.5)!important;background:rgba(68,50,21,.3)!important}
+  .freeboard-studio,.studio03{border-color:rgba(226,184,105,.35);box-shadow:inset 0 1px 0 rgba(255,240,197,.08),0 8px 28px rgba(0,0,0,.12)}
+  .freeboard-tool.ko-tool{border:1px solid rgba(219,185,122,.35);background:linear-gradient(150deg,rgba(76,70,58,.2),rgba(10,30,31,.65));border-radius:11px;box-shadow:inset 0 1px 0 rgba(255,229,155,.11),0 2px 6px rgba(0,0,0,.25);transition:box-shadow .12s ease,border-color .12s ease,transform .12s ease}
+  .freeboard-tool.ko-tool:hover{border-color:#e6b854;box-shadow:0 0 16px rgba(236,176,61,.27),inset 0 1px 0 rgba(255,233,177,.22);transform:translateY(-1px)}
+  .freeboard-tool.ko-tool[aria-pressed="true"]{outline:2px solid var(--ko-gold)!important;outline-offset:1px;box-shadow:0 0 15px rgba(228,166,45,.32)!important}
+  .freeboard-tool.ko-tool:focus-visible{outline:3px solid #ffe5ad!important;outline-offset:3px}
+  .ko-tool .ko-symbol{object-fit:cover;border-radius:8px;filter:drop-shadow(0 1px 3px rgba(201,143,26,.14))}
+  .studio03-step[aria-current="step"]{box-shadow:inset 0 0 0 2px var(--ko-gold)!important}
+  @media(prefers-reduced-motion:reduce){.freeboard-tool.ko-tool{transition:none}.freeboard-tool.ko-tool:hover{transform:none}}
+
+</style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
 <body>
@@ -1249,11 +1276,11 @@
     <header class="app-header">
       <div>
         <span class="data-label app-tagline" hidden>Football à 8 · Catégorie U12/U13 · Formation d’éducateurs</span>
-        <h1 class="header-title">KOLLECTIF</h1>
+        <h1 class="header-title ko-wordmark"><img src="./assets/kollectif-k.svg" alt="" aria-hidden="true"><span>OLLECTIF</span></h1>
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
-        <div class="app-version" aria-label="Version de l’application">v5.2 LAB</div>
+        <div class="app-version" aria-label="Version de l’application">v5.2 • OR LAB</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -4359,5 +4386,33 @@
       navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Mode hors-ligne non actif :', err));
     }
   </script>
+<script>
+  // Buttons keep their original click handlers, titles, aria labels and state.
+  (function applyPremiumIcons(){
+    const iconRoot='./assets/ui/';
+    const menu={
+      'Déplacer':'move','Tracer avec flèche':'pass','Tracer sans flèche':'shot',
+      'Dessiner librement':'pen','Gomme':'eraser','Annuler':'undo','Rétablir':'redo',
+      'Réinitialiser':'reset','Éditer les points':'point','Enregistrer la compo':'save',
+      'Charger la compo':'open','Supprimer la compo':'delete',
+      'Exporter JSON':'export','Importer JSON':'import',
+      'Exporter PDF':'pdf','Exporter MP4':'mp4',
+      'Enregistrer l’animation':'save','Charger l’animation':'open',
+      'Supprimer l’animation':'delete','Nouvelle animation':'multi',
+      'Ajouter une étape':'multi','Supprimer l’étape':'delete',
+      'Prévisualiser':'mp4','Arrêter':'reset',
+      'Importer une animation':'import'
+    };
+    document.querySelectorAll('.freeboard-tool.icon-tool').forEach(btn=>{
+      const label=btn.getAttribute('aria-label')||'';
+      let key=menu[label];
+      if(!key && label==='Tracer avec flèche')key='pass';
+      if(!key)return;
+      const img=document.createElement('img');img.src=iconRoot+key+'.png';
+      img.alt='';img.className='ko-symbol';img.loading='eager';
+      btn.classList.add('ko-tool');btn.replaceChildren(img);
+    });
+  })();
+</script>
 </body>
 </html>
