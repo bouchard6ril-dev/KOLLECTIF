@@ -1286,6 +1286,14 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
     #layer-team .token-group, #layer-opponents .free-opponent { filter:drop-shadow(0 1.4px 2.1px rgba(0,0,0,.65)); }
     #layer-team .token-group:hover { filter:drop-shadow(0 0 3px rgba(255,209,101,.85)); }
     #layer-team .token-label, #layer-opponents .opp-label { font-weight:800; paint-order:stroke; stroke:rgba(8,11,14,.16); stroke-width:.45; }
+  /* R6-B — outil Texte : panneau contextuel compact, mobile responsive. */
+  .free-text-panel{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:8px 0;padding:10px;border:1px solid rgba(231,190,114,.45);border-radius:12px;background:#101c20}
+  .free-text-panel[hidden]{display:none!important}
+  .free-text-panel label{display:flex;gap:6px;align-items:center;font-size:12px;color:#f2ede3}
+  .free-text-panel input[type=color]{width:38px;height:34px;padding:2px;background:#1a292e;border:1px solid #a8b6ba;border-radius:7px}
+  .free-text-panel select{height:35px;padding:5px 8px;border-radius:7px;background:#1c2a30;color:#f2ede3;border:1px solid #64757b}
+  .free-text-toggle[aria-pressed=true]{border-color:#e7be72!important;background:#453923!important;color:#fff1bb!important}
+  .free-text-tip{font-size:12px;color:#a8b6ba}
 </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1381,6 +1389,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="arrow" aria-pressed="false" onclick="setFreeTool('arrow')" aria-label="Tracer avec flèche" title="Tracer avec flèche">➜</button>
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="line" aria-pressed="false" onclick="setFreeTool('line')" aria-label="Tracer sans flèche" title="Tracer sans flèche">／</button>
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="pen" aria-pressed="false" onclick="setFreeTool('pen')" aria-label="Dessiner librement" title="Dessiner librement">✎</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="text" aria-pressed="false" onclick="setFreeTool('text')" aria-label="Texte" title="Placer, sélectionner ou modifier un texte">T</button>
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="erase" aria-pressed="false" onclick="setFreeTool('erase')" aria-label="Gomme" title="Gomme">⌫</button>
             <button type="button" class="freeboard-tool icon-tool" onclick="freeboardUndo()" aria-label="Annuler" title="Annuler">↶</button>
             <button type="button" class="freeboard-tool icon-tool" onclick="freeboardRedo()" aria-label="Rétablir" title="Rétablir">↷</button>
@@ -1391,6 +1400,17 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
             <select id="free-point-action" class="compact-draw-select" hidden aria-label="Opération sur les points" title="Opération sur les points" onchange="state.freePointAction=this.value"><option value="move">Déplacer point</option><option value="add">Ajouter point</option><option value="delete">Supprimer point</option></select>
             <button type="button" id="free-finish-path" class="freeboard-tool" hidden onclick="finishFreePath()" title="Terminer le tracé multi-points">✓ Terminer</button>
             <button type="button" id="free-cancel-path" class="freeboard-tool" hidden onclick="cancelFreePath()" title="Annuler le tracé en cours">✕</button>
+          </div>
+          <div id="free-text-panel" class="free-text-panel" hidden role="group" aria-label="Mise en forme du texte">
+            <label title="Couleur"><span>Couleur</span><input id="free-text-color" type="color" value="#f2ede3" onchange="changeFreeTextStyle('color',this.value)" aria-label="Couleur du texte"></label>
+            <label><span>Taille</span><select id="free-text-size" onchange="changeFreeTextStyle('size',this.value)" aria-label="Taille du texte"><option value="14">Petit</option><option value="20" selected>Moyen</option><option value="28">Grand</option></select></label>
+            <label><span>Police</span><select id="free-text-font" onchange="changeFreeTextStyle('font',this.value)" aria-label="Police du texte"><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="monospace">Mono</option></select></label>
+            <button type="button" id="free-text-bold" class="freeboard-tool free-text-toggle" onclick="toggleFreeTextStyle('bold')" aria-pressed="false" title="Gras">B</button>
+            <button type="button" id="free-text-italic" class="freeboard-tool free-text-toggle" onclick="toggleFreeTextStyle('italic')" aria-pressed="false" title="Italique"><i>I</i></button>
+            <button type="button" id="free-text-underline" class="freeboard-tool free-text-toggle" onclick="toggleFreeTextStyle('underline')" aria-pressed="false" title="Souligné"><u>U</u></button>
+            <button type="button" class="freeboard-tool" onclick="editSelectedFreeText()" title="Modifier le texte sélectionné">Modifier</button>
+            <button type="button" class="freeboard-tool" onclick="removeSelectedFreeText()" title="Supprimer le texte sélectionné">Suppr.</button>
+            <span class="free-text-tip">Choisis T puis touche le terrain ; déplace un texte avec ↔.</span>
           </div>
           <div class="freeboard-projects">
             <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la compo" aria-label="Nom de la composition">
@@ -2627,6 +2647,8 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       freeBall: null,
       freeMarks: [],
       freeTool: 'move',
+      freeTextStyle: {color:'#f2ede3',size:20,font:'Arial',bold:false,italic:false,underline:false},
+      freeSelectedText: -1,
       freeLineFamily: 'pass',
       freeLineShape: 'straight',
       freeDraft: null,
@@ -3498,17 +3520,72 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
     function freeSnapshot() {
       return JSON.parse(JSON.stringify({schema:1,players:state.freePositions,opponents:state.freeOpponents,ball:state.freeBall,marks:state.freeMarks,sourceSequence:state.currentSeqIndex,updatedAt:new Date().toISOString()}));
     }
+    function saneFreeText(m) {
+      return m&&m.type==='text'&&Number.isFinite(m.x)&&Number.isFinite(m.y)
+        &&m.x>=0&&m.x<=900&&m.y>=0&&m.y<=900
+        &&typeof m.text==='string'&&m.text.length>0&&m.text.length<=180
+        &&m.style&&/^#[0-9a-fA-F]{6}$/.test(m.style.color)
+        &&[14,20,28].includes(Number(m.style.size))
+        &&['Arial','Georgia','monospace'].includes(m.style.font)
+        &&['bold','italic','underline'].every(k=>typeof m.style[k]==='boolean');
+    }
     function sanePoint(p) {return Array.isArray(p)&&p.length===2&&p.every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=900);}
     function isValidFreeboard(obj) {
-      return !!(obj&&obj.schema===1&&obj.players&&typeof obj.players==='object'&&TOKEN_META.every(t=>sanePoint(obj.players[t.id]))&&Array.isArray(obj.opponents)&&obj.opponents.length<=40&&obj.opponents.every(sanePoint)&&sanePoint(obj.ball)&&Array.isArray(obj.marks)&&obj.marks.length<=1000&&obj.marks.every(m=>['arrow','line','pen','path'].includes(m.type)&&Array.isArray(m.points)&&m.points.length>=2&&m.points.length<=2000&&m.points.every(sanePoint)));
+      return !!(obj&&obj.schema===1&&obj.players&&typeof obj.players==='object'&&TOKEN_META.every(t=>sanePoint(obj.players[t.id]))&&Array.isArray(obj.opponents)&&obj.opponents.length<=40&&obj.opponents.every(sanePoint)&&sanePoint(obj.ball)&&Array.isArray(obj.marks)&&obj.marks.length<=1000&&obj.marks.every(m=>m.type==='text'?saneFreeText(m):['arrow','line','pen','path'].includes(m.type)&&Array.isArray(m.points)&&m.points.length>=2&&m.points.length<=2000&&m.points.every(sanePoint)));
     }
     function applyFreeSnapshot(snap) {
       if(!isValidFreeboard(snap))throw new Error('Composition invalide ou incompatible');
       state.freePositions=JSON.parse(JSON.stringify(snap.players));state.freeOpponents=JSON.parse(JSON.stringify(snap.opponents));
-      state.freeBall=snap.ball.slice();state.freeMarks=JSON.parse(JSON.stringify(snap.marks));
+      state.freeBall=snap.ball.slice();state.freeMarks=JSON.parse(JSON.stringify(snap.marks));state.freeSelectedText=-1;
       renderPitch();
     }
     function tellFreeboard(message){const el=document.getElementById('freeboard-feedback');if(el)el.textContent=message;}
+    function freeTextSelection() {
+      return state.freeMarks[state.freeSelectedText]?.type==='text'?state.freeMarks[state.freeSelectedText]:null;
+    }
+    function syncFreeTextPanel(){
+      const panel=document.getElementById('free-text-panel');if(!panel)return;
+      panel.hidden=!state.freeboardMode || (state.freeTool!=='text' && !freeTextSelection());
+      const style=freeTextSelection()?.style||state.freeTextStyle;
+      const fields={color:'free-text-color',size:'free-text-size',font:'free-text-font'};
+      for(const [k,id] of Object.entries(fields)){const el=document.getElementById(id);if(el)el.value=String(style[k]);}
+      for(const k of ['bold','italic','underline'])document.getElementById('free-text-'+k)?.setAttribute('aria-pressed',String(!!style[k]));
+    }
+    function changeFreeTextStyle(key,value){
+      if(!['color','size','font'].includes(key))return;
+      if(key==='size')value=Number(value);
+      const next={...state.freeTextStyle,[key]:value};
+      const target=freeTextSelection();
+      if(target){rememberFreeEdit();target.style={...target.style,[key]:value};renderPitch();persistFreeboard();}
+      state.freeTextStyle=next;syncFreeTextPanel();
+    }
+    function toggleFreeTextStyle(key){
+      if(!['bold','italic','underline'].includes(key))return;
+      const target=freeTextSelection(),previous=target?target.style[key]:state.freeTextStyle[key];
+      if(target){rememberFreeEdit();target.style[key]=!previous;renderPitch();persistFreeboard();}
+      state.freeTextStyle[key]=!previous;syncFreeTextPanel();
+    }
+    function editSelectedFreeText(){
+      const t=freeTextSelection();if(!t){tellFreeboard('Sélectionne un texte sur le terrain.');return;}
+      const input=window.prompt('Texte sur le terrain (180 caractères maximum)',t.text);
+      if(input===null)return;
+      const value=input.trim().slice(0,180);
+      if(!value){tellFreeboard('Le texte ne peut pas être vide. Utilise Suppr. pour le retirer.');return;}
+      if(value!==t.text){rememberFreeEdit();t.text=value;renderPitch();persistFreeboard();}
+    }
+    function removeSelectedFreeText(){
+      if(!freeTextSelection()){tellFreeboard('Sélectionne un texte à supprimer.');return;}
+      rememberFreeEdit();state.freeMarks.splice(state.freeSelectedText,1);state.freeSelectedText=-1;
+      renderPitch();persistFreeboard();syncFreeTextPanel();
+    }
+    function addFreeTextAt(point){
+      const input=window.prompt('Texte à placer sur le terrain (180 caractères maximum)','');
+      if(input===null)return;
+      const value=input.trim().slice(0,180);
+      if(!value){tellFreeboard('Saisis un texte non vide.');return;}
+      rememberFreeEdit();state.freeMarks.push({type:'text',x:point[0],y:point[1],text:value,style:{...state.freeTextStyle}});
+      state.freeSelectedText=state.freeMarks.length-1;renderPitch();persistFreeboard();syncFreeTextPanel();
+    }
     function setFreeLineFamily(value){state.freeLineFamily=['pass','run','dribble'].includes(value)?value:'pass';}
     function setFreeLineShape(value){
       if(state.freeDraft)cancelFreePath();
@@ -3517,6 +3594,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
     }
     function updateFreeToolUI(){
       const edit=state.freeTool==='editpoints';
+      syncFreeTextPanel();
       const action=document.getElementById('free-point-action');if(action)action.hidden=!edit;
       const multi=['polyline','smooth'].includes(state.freeLineShape) && ['arrow','line'].includes(state.freeTool);
       const finish=document.getElementById('free-finish-path');if(finish)finish.hidden=!multi;
@@ -3574,9 +3652,9 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       catch(e){tellFreeboard('Sauvegarde locale indisponible : utilise Exporter JSON.');}
     }
     function setFreeTool(tool){
-      if(!['move','arrow','line','pen','erase','editpoints'].includes(tool))return;
+      if(!['move','arrow','line','pen','erase','editpoints','text'].includes(tool))return;
       if(state.freeDraft)cancelFreePath();
-      state.freeTool=tool;state.freeSelectedMark=-1;
+      state.freeTool=tool;state.freeSelectedMark=-1;if(tool!=='text'&&tool!=='move')state.freeSelectedText=-1;
       document.querySelectorAll('[data-free-tool]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.freeTool===tool)));
       document.getElementById('pitch-svg')?.classList.toggle('freeboard-drawing',state.freeboardMode && !['move','editpoints'].includes(tool));
       updateFreeToolUI();renderFreeMarks();
@@ -3584,7 +3662,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
     function initialFreeboardFromFrame(){
       const frame=getInterpolatedFrame(getCurrentSeq(),state.progress);
       state.freePositions={};TOKEN_META.forEach(meta=>{const p=frame.players[meta.id]||[450,270];state.freePositions[meta.id]=p.slice()});
-      state.freeOpponents=(frame.opp||[]).map(p=>p.slice());state.freeBall=frame.ball.slice();state.freeMarks=[];
+      state.freeOpponents=(frame.opp||[]).map(p=>p.slice());state.freeBall=frame.ball.slice();state.freeMarks=[];state.freeSelectedText=-1;
     }
     async function toggleFreeboard(forceVal){
       const next=typeof forceVal==='boolean'?forceVal:!state.freeboardMode;
@@ -3623,6 +3701,22 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       if(!state.freeboardMode)return;
       const marks=(state.studio03Previewing&&state.studio03PreviewMarks)?state.studio03PreviewMarks:state.freeMarks;
       function drawMark(mark,i,draft=false){
+        if(mark?.type==='text'){
+          const attrs={x:mark.x,y:mark.y,'data-mark-index':i,'data-text-mark-index':i,
+            'font-family':mark.style.font,'font-size':mark.style.size,
+            'font-weight':mark.style.bold?'700':'400','font-style':mark.style.italic?'italic':'normal',
+            'text-decoration':mark.style.underline?'underline':'none',fill:mark.style.color,
+            'paint-order':'stroke','stroke':'rgba(0,0,0,.55)','stroke-width':'.8',
+            'dominant-baseline':'middle','pointer-events':'all'};
+          const el=elSvg('text',attrs);el.textContent=mark.text;layer.appendChild(el);
+          if(!draft&&i===state.freeSelectedText){
+            const box=elSvg('rect',{x:mark.x-4,y:mark.y-mark.style.size*.9,
+              width:Math.max(20,mark.text.length*mark.style.size*.62+8),height:mark.style.size*1.35,
+              rx:3,fill:'none',stroke:'#e7be72','stroke-width':'1.4','stroke-dasharray':'4 3',
+              'pointer-events':'none'});layer.appendChild(box);
+          }
+          return;
+        }
         if(!mark?.points?.length)return;
         const style=getMarkStyle(mark);
         const attrs={fill:'none',stroke:style.stroke,'stroke-width':draft?2.5:style.width,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
@@ -3652,6 +3746,31 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       marks.forEach((mark,i)=>drawMark(mark,i));
       if(state.freeDraft){drawMark(state.freeDraft,-1,true);state.freeDraft.points.forEach(pt=>layer.appendChild(elSvg('circle',{cx:pt[0],cy:pt[1],r:4,fill:'#ffdd83',stroke:'#111','stroke-width':1})));}
     }
+    // The move tool and text tool both allow selecting and dragging annotations.
+    document.getElementById('pitch-svg')?.addEventListener('pointerdown',ev=>{
+      if(!state.freeboardMode||state.studio03Previewing)return;
+      const target=ev.target?.closest?.('[data-text-mark-index]');
+      const textIndex=target?Number(target.dataset.textMarkIndex):-1;
+      if(textIndex>=0 && ['move','text','erase'].includes(state.freeTool)){
+        ev.preventDefault();ev.stopImmediatePropagation();
+        if(state.freeTool==='erase'){
+          rememberFreeEdit();state.freeMarks.splice(textIndex,1);state.freeSelectedText=-1;
+          renderPitch();persistFreeboard();syncFreeTextPanel();return;
+        }
+        state.freeSelectedText=textIndex;
+        state.freeTextStyle={...state.freeMarks[textIndex].style};
+        syncFreeTextPanel();
+        if(state.freeTool==='move'){
+          rememberFreeEdit();state.freeGesture={kind:'text',id:textIndex,pointerId:ev.pointerId,changed:false};
+          try{document.getElementById('pitch-svg').setPointerCapture(ev.pointerId);}catch(_){}
+        }
+        renderFreeMarks();return;
+      }
+      if(state.freeTool==='text'){
+        ev.preventDefault();ev.stopImmediatePropagation();
+        addFreeTextAt(clientToSvgCoords(ev.clientX,ev.clientY));return;
+      }
+    },true);
     document.getElementById('pitch-svg')?.addEventListener('pointerdown',ev=>{
       if(!state.freeboardMode||state.freeTool==='move'||state.studio03Previewing)return;
       ev.preventDefault();ev.stopPropagation();
@@ -3705,6 +3824,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       if(g.kind==='team'&&state.freePositions)state.freePositions[g.id]=point;
       else if(g.kind==='opponent'&&state.freeOpponents)state.freeOpponents[g.id]=point;
       else if(g.kind==='ball')state.freeBall=point;
+      else if(g.kind==='text'&&state.freeMarks[g.id]){state.freeMarks[g.id].x=point[0];state.freeMarks[g.id].y=point[1];}
       else if(g.kind==='point'){
         const mark=state.freeMarks[g.id];if(mark?.points?.[g.pointIndex])mark.points[g.pointIndex]=point;
       }
@@ -4032,7 +4152,15 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       const url=URL.createObjectURL(blob);
       const w=window.open('','_blank');
       if(!w){ alert('Autorise les pop-ups pour exporter en PDF.'); return; }
-      w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${label}</title><style>body{font-family:Arial,sans-serif;background:#fff;color:#111;margin:20px}h1{font-size:20px;margin:0 0 12px}img{max-width:100%;height:auto;border:1px solid #ddd;border-radius:10px}p{font-size:12px;color:#444}</style></head><body><h1>${label}</h1><img src="${url}" alt="Export terrain"><p>Utilise la boîte d’impression du navigateur puis choisis « Enregistrer en PDF ».</p></body></html>`);
+      w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${label}</title><style>body{font-family:Arial,sans-serif;background:#fff;color:#111;margin:20px}h1{font-size:20px;margin:0 0 12px}img{max-width:100%;height:auto;border:1px solid #ddd;border-radius:10px}p{font-size:12px;color:#444}  /* R6-B — outil Texte : panneau contextuel compact, mobile responsive. */
+  .free-text-panel{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:8px 0;padding:10px;border:1px solid rgba(231,190,114,.45);border-radius:12px;background:#101c20}
+  .free-text-panel[hidden]{display:none!important}
+  .free-text-panel label{display:flex;gap:6px;align-items:center;font-size:12px;color:#f2ede3}
+  .free-text-panel input[type=color]{width:38px;height:34px;padding:2px;background:#1a292e;border:1px solid #a8b6ba;border-radius:7px}
+  .free-text-panel select{height:35px;padding:5px 8px;border-radius:7px;background:#1c2a30;color:#f2ede3;border:1px solid #64757b}
+  .free-text-toggle[aria-pressed=true]{border-color:#e7be72!important;background:#453923!important;color:#fff1bb!important}
+  .free-text-tip{font-size:12px;color:#a8b6ba}
+</style></head><body><h1>${label}</h1><img src="${url}" alt="Export terrain"><p>Utilise la boîte d’impression du navigateur puis choisis « Enregistrer en PDF ».</p></body></html>`);
       w.document.close();
       setTimeout(()=>{w.focus();w.print();},350);
       setTimeout(()=>URL.revokeObjectURL(url),3000);
@@ -4522,7 +4650,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
     const iconRoot='./assets/ui/';
     const menu={
       'Déplacer':'move','Tracer avec flèche':'pass','Tracer sans flèche':'shot',
-      'Dessiner librement':'pen','Gomme':'eraser','Annuler':'undo','Rétablir':'redo',
+      'Dessiner librement':'pen','Texte':'text','Gomme':'eraser','Annuler':'undo','Rétablir':'redo',
       'Réinitialiser':'reset','Éditer les points':'point','Enregistrer la compo':'save',
       'Charger la compo':'open','Supprimer la compo':'delete',
       'Exporter JSON':'export','Importer JSON':'import',
