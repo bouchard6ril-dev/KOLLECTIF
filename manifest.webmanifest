@@ -1,22 +1,16 @@
 {
-  "name": "Ardoise tactique 2-4-1 — Augustin autonome",
-  "short_name": "ARDOISE 2-4-1",
-  "description": "Ardoise tactique et 28 narrations Augustin préenregistrées, disponibles hors ligne après installation HTTPS",
+  "name": "KOLLECTIF",
+  "short_name": "KOLLECTIF",
+  "description": "Animation tactique 2-4-1, ardoise libre et studio de création.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0c1214",
   "theme_color": "#0c1214",
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "./icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any"},
+    {"src": "./icon-master-1024.png", "sizes": "1024x1024", "type": "image/png"}
   ]
 }

@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Ardoise 2-4-1">
+  <meta name="apple-mobile-web-app-title" content="KOLLECTIF">
   <meta name="theme-color" content="#0c1214">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-180.png">
   <meta name="artifact-type" content="tool">
   <meta name="design-style" content="aurora">
-  <title>Ardoise Vidéo-Tactique 2-4-1 — Formation Éducateurs U12/U13</title>
+  <title>KOLLECTIF — Animation tactique 2-4-1</title>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -1076,6 +1076,47 @@
 
     #freeboard-feedback { font-size:12px; min-height:18px; color:var(--tertiary); }
 
+  
+    /* Lot 03 R2 — compactage, filtre, codes couleur, KOLLECTIF */
+    .compact-metrics{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .metric-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:var(--hairline);border-radius:999px;background:var(--surface-container-low)}
+    .metric-key{font-family:var(--font-label);font-size:.74rem;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:.04em}
+    .strip-toolbar{justify-content:flex-end}
+    .compact-select{min-width:210px}
+    .header-lede,.freeboard-help,.studio03-info,.pitch-direction-note,.subtitle-text{color:var(--tertiary)}
+    .header-lede,.freeboard-help,.studio03-info{line-height:1.5}
+    .freeboard-studio,.studio03{padding:14px;border-radius:16px}
+    .freeboard-tools,.freeboard-projects,.studio03-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .freeboard-projects select,.studio03-bar select{min-width:160px}
+    .freeboard-tools .freeboard-tool,.freeboard-projects .freeboard-tool,.studio03 .freeboard-tool{min-width:42px;padding:8px 10px}
+    .icon-tool{font-size:18px;line-height:1;font-weight:700}
+    .icon-btn{min-width:52px;justify-content:center;padding-inline:12px}
+    .icon-btn-wide{min-width:70px}
+    .source-pill{border:var(--hairline);background:var(--surface-container-high);color:var(--tertiary);border-radius:999px;padding:8px 14px;cursor:help;font:inherit}
+    .compact-sources{display:flex;justify-content:flex-end}
+    .studio03-feedback{min-height:0}
+    #studio03-feedback:empty{display:none}
+    #player-category.phase-offensive,.seq-cat.phase-offensive{color:#68e08a}
+    #player-category.phase-defensive,.seq-cat.phase-defensive{color:#ff7b7b}
+    #player-category.phase-transition,.seq-cat.phase-transition{color:#72bfff}
+    #player-category.phase-restart,.seq-cat.phase-restart{color:#f3da72}
+    .seq-card{position:relative;overflow:hidden}
+    .seq-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent}
+    .seq-card[data-cat-key="offensive"]::before{background:#2bb96b}
+    .seq-card[data-cat-key="defensive"]::before{background:#d95b5b}
+    .seq-card[data-cat-key="transition"]::before{background:#4ea1ff}
+    .seq-card[data-cat-key="restart"]::before{background:#d3b236}
+    .seq-card[data-cat-key="offensive"] .seq-cat{color:#68e08a}
+    .seq-card[data-cat-key="defensive"] .seq-cat{color:#ff8f8f}
+    .seq-card[data-cat-key="transition"] .seq-cat{color:#8ec5ff}
+    .seq-card[data-cat-key="restart"] .seq-cat{color:#f3de7f}
+    #offline-status{display:none!important}
+    .subtitle-meta .data-label{color:var(--tertiary)}
+    @media (max-width:760px){
+      .compact-select{min-width:160px}
+      .metric-chip{padding:6px 10px}
+    }
+
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1084,36 +1125,28 @@
     <!-- Header -->
     <header class="app-header">
       <div>
-        <span class="data-label">Football à 8 · Catégorie U12/U13 · Formation d’éducateurs</span>
-        <h1 class="header-title">Ardoise Vidéo-Tactique 2-4-1</h1>
-        <p class="header-lede">
-          Module interactif d’animation collective : observez les déplacements directs des 8 postes (G, DD, DG, M6, M8, MG, MD, AT), écoutez la voix-off synchronisée et manipulez les repères Z1/Z2/Z3, ÉLAN/STOP et touches.
+        <span class="data-label app-tagline" hidden>Football à 8 · Catégorie U12/U13 · Formation d’éducateurs</span>
+        <h1 class="header-title">KOLLECTIF</h1>
+        <p class="header-lede compact-note">
+          Atelier interactif 2-4-1 : animation collective, ardoise libre et studio de création pour préparer, expliquer et faire vivre les séquences tactiques.
         </p>
       </div>
-      <div class="header-metrics">
-        <div class="metric-tile">
-          <span class="data-label">Progression</span>
-          <span class="metric-value" id="metric-mastered">0 / 9</span>
-          <span class="metric-sub">Séquences validées</span>
-        </div>
-        <div class="metric-tile">
-          <span class="data-label">Organisation</span>
-          <span class="metric-value">1-2-4-1</span>
-          <span class="metric-sub">8 joueurs · 3 zones</span>
-        </div>
-        <div class="metric-tile">
-          <span class="data-label">Audio FR</span>
-          <span class="metric-value" id="metric-voice-state">Prêt</span>
-          <span class="metric-sub">Augustin · 28 fichiers locaux</span>
-        </div>
+      <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
+        <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
+        <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
+        <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
       </div>
     </header>
 
     <!-- Sequence Playlist -->
     <section class="sequence-strip-wrap" aria-label="Sélection des séquences tactiques">
-      <div class="strip-head">
-        <span class="data-label">Programme vidéo-tactique (9 séquences animées)</span>
-        <span class="data-label" id="active-seq-counter">Séquence 01 / 09</span>
+      <div class="strip-head strip-toolbar">
+        <div class="filter-stack">
+          <label for="sequence-filter" class="field-label">Filtre phase</label>
+          <select id="sequence-filter" class="select-input compact-select" onchange="applySequenceFilter(this.value)">
+            <option value="all">Toutes les phases</option>
+          </select>
+        </div>
       </div>
       <div class="sequence-strip" id="sequence-strip"></div>
     </section>
@@ -1128,11 +1161,11 @@
             <h2 class="player-title" id="player-title">01. Structure 2-4-1 &amp; Découpage Z1 / Z2 / Z3</h2>
           </div>
           <div class="overlay-toolbar" role="group" aria-label="Calques tactiques">
-            <button type="button" class="toggle-chip" id="btn-layer-zones" aria-pressed="true" onclick="toggleLayer('zones')">Zones Z1/Z2/Z3</button>
-            <button type="button" class="toggle-chip" id="btn-layer-vectors" aria-pressed="true" onclick="toggleLayer('vectors')">Vecteurs &amp; Triangles</button>
-            <button type="button" class="toggle-chip" id="btn-layer-opponents" aria-pressed="true" onclick="toggleLayer('opponents')">Bloc adverse</button>
-            <button type="button" class="toggle-chip mode-free" id="btn-mode-free" aria-pressed="false" onclick="toggleFreeboard()">Ardoise libre</button>
-            <button type="button" class="toggle-chip" id="btn-mode-studio03" aria-pressed="false" onclick="studio03Toggle()">🎬 Studio</button>
+            <button type="button" class="toggle-chip" id="btn-layer-zones" aria-pressed="true" onclick="toggleLayer('zones')" title="Afficher / masquer les zones">Zones Z1/Z2/Z3</button>
+            <button type="button" class="toggle-chip" id="btn-layer-vectors" aria-pressed="true" onclick="toggleLayer('vectors')" title="Afficher / masquer les vecteurs">Vecteurs &amp; Triangles</button>
+            <button type="button" class="toggle-chip" id="btn-layer-opponents" aria-pressed="true" onclick="toggleLayer('opponents')" title="Afficher / masquer le bloc adverse">Bloc adverse</button>
+            <button type="button" class="toggle-chip mode-free" id="btn-mode-free" aria-pressed="false" onclick="toggleFreeboard()" title="Activer l’ardoise libre">Ardoise libre</button>
+            <button type="button" class="toggle-chip" id="btn-mode-studio03" aria-pressed="false" onclick="studio03Toggle()" title="Ouvrir le studio de création">🎬 Studio</button>
           </div>
         </div>
 
@@ -1155,26 +1188,28 @@
         <!-- V5 · Lot 02 : édition tactique. Ne touche pas aux séquences d'origine. -->
         <section id="freeboard-studio" class="freeboard-studio" hidden aria-label="Outils de l'ardoise libre">
           <div class="freeboard-tools" role="group" aria-label="Outils tactiques">
-            <button type="button" class="freeboard-tool" data-free-tool="move" aria-pressed="true" onclick="setFreeTool('move')">↔ Déplacer</button>
-            <button type="button" class="freeboard-tool" data-free-tool="arrow" aria-pressed="false" onclick="setFreeTool('arrow')">➜ Flèche</button>
-            <button type="button" class="freeboard-tool" data-free-tool="line" aria-pressed="false" onclick="setFreeTool('line')">／ Trait</button>
-            <button type="button" class="freeboard-tool" data-free-tool="pen" aria-pressed="false" onclick="setFreeTool('pen')">✎ Dessiner</button>
-            <button type="button" class="freeboard-tool" data-free-tool="erase" aria-pressed="false" onclick="setFreeTool('erase')">⌫ Gomme</button>
-            <button type="button" class="freeboard-tool" onclick="freeboardUndo()">↶ Annuler</button>
-            <button type="button" class="freeboard-tool" onclick="freeboardRedo()">↷ Rétablir</button>
-            <button type="button" class="freeboard-tool" onclick="resetFreeboard()">Réinitialiser</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="move" aria-pressed="true" onclick="setFreeTool('move')" aria-label="Déplacer" title="Déplacer">↔</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="arrow" aria-pressed="false" onclick="setFreeTool('arrow')" aria-label="Flèche" title="Flèche">➜</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="line" aria-pressed="false" onclick="setFreeTool('line')" aria-label="Trait" title="Trait">／</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="pen" aria-pressed="false" onclick="setFreeTool('pen')" aria-label="Dessiner" title="Dessiner">✎</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="erase" aria-pressed="false" onclick="setFreeTool('erase')" aria-label="Gomme" title="Gomme">⌫</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="freeboardUndo()" aria-label="Annuler" title="Annuler">↶</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="freeboardRedo()" aria-label="Rétablir" title="Rétablir">↷</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="resetFreeboard()" aria-label="Réinitialiser" title="Réinitialiser">⟳</button>
           </div>
           <div class="freeboard-projects">
-            <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la composition" aria-label="Nom de la composition">
-            <button type="button" class="freeboard-tool" onclick="saveNamedFreeboard()">Enregistrer</button>
-            <select id="freeboard-saved" aria-label="Compositions enregistrées"><option value="">Mes compositions…</option></select>
-            <button type="button" class="freeboard-tool" onclick="loadNamedFreeboard()">Charger</button>
-            <button type="button" class="freeboard-tool" onclick="deleteNamedFreeboard()">Supprimer</button>
-            <button type="button" class="freeboard-tool" onclick="exportFreeboard()">Exporter JSON</button>
-            <button type="button" class="freeboard-tool" onclick="document.getElementById('freeboard-import').click()">Importer JSON</button>
+            <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la compo" aria-label="Nom de la composition">
+            <button type="button" class="freeboard-tool icon-tool" onclick="saveNamedFreeboard()" aria-label="Enregistrer la compo" title="Enregistrer la compo">💾</button>
+            <select id="freeboard-saved" aria-label="Compositions enregistrées"><option value="">Mes compos…</option></select>
+            <button type="button" class="freeboard-tool icon-tool" onclick="loadNamedFreeboard()" aria-label="Charger la compo" title="Charger la compo">📂</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="deleteNamedFreeboard()" aria-label="Supprimer la compo" title="Supprimer la compo">🗑</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="exportFreeboard()" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="document.getElementById('freeboard-import').click()" aria-label="Importer JSON" title="Importer JSON">⤒</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="exportFreeboardPDF()" aria-label="Exporter PDF" title="Exporter PDF">🧾</button>
+            <button type="button" class="freeboard-tool icon-tool" onclick="exportFreeboardMP4()" aria-label="Exporter MP4" title="Exporter MP4">🎞️</button>
             <input type="file" id="freeboard-import" accept=".json,application/json" style="display:none" onchange="importFreeboard(event)">
           </div>
-          <p class="freeboard-help">Déplace les joueurs des deux équipes ou le ballon. Pour tracer, choisis un outil puis dessine sur le terrain. Sauvegarde automatique locale par séquence ; export conseillé pour conserver une copie durable.</p>
+          <p class="freeboard-help compact-note">Déplace, trace puis sauvegarde ta compo. Export conseillé pour garder une copie durable.</p>
           <div id="freeboard-feedback" role="status" aria-live="polite"></div>
         </section>
 
@@ -1182,32 +1217,34 @@
         <section id="studio03" class="studio03" hidden aria-label="Studio de séquences animées">
           <div class="studio03-bar">
             <strong>🎬 Studio de création</strong>
-            <input id="studio03-name" class="studio03-name" maxlength="80" aria-label="Nom de la séquence créée" placeholder="Nom de la séquence">
-            <button class="freeboard-tool" type="button" onclick="studio03New()">+ Nouvelle</button>
-            <button class="freeboard-tool" type="button" onclick="studio03Save()">💾 Enregistrer</button>
+            <input id="studio03-name" class="studio03-name" maxlength="80" aria-label="Nom de la séquence créée" placeholder="Nouvelle animation">
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03New()" aria-label="Nouvelle animation" title="Nouvelle animation">✚</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Save()" aria-label="Enregistrer l’animation" title="Enregistrer l’animation">💾</button>
           </div>
           <div class="studio03-bar">
-            <label for="studio03-saved">Mes animations</label>
-            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Choisir…</option></select>
-            <button class="freeboard-tool" type="button" onclick="studio03Load()">Charger</button>
-            <button class="freeboard-tool" type="button" onclick="studio03Delete()">Supprimer</button>
-            <button class="freeboard-tool" type="button" onclick="studio03Export()">Exporter JSON</button>
-            <button class="freeboard-tool" type="button" onclick="document.getElementById('studio03-import').click()">Importer JSON</button>
+            <label for="studio03-saved">Mes animes</label>
+            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Mes animes…</option></select>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Load()" aria-label="Charger l’animation" title="Charger l’animation">📂</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Delete()" aria-label="Supprimer l’animation" title="Supprimer l’animation">🗑</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Export()" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="document.getElementById('studio03-import').click()" aria-label="Importer JSON" title="Importer JSON">⤒</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03ExportPDF()" aria-label="Exporter PDF" title="Exporter PDF">🧾</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03ExportMP4()" aria-label="Exporter MP4" title="Exporter MP4">🎞️</button>
             <input type="file" id="studio03-import" accept=".json,application/json" hidden onchange="studio03Import(event)">
           </div>
           <div id="studio03-steps" class="studio03-steps" role="group" aria-label="Étapes de l'animation"></div>
           <div class="studio03-bar">
-            <button class="freeboard-tool" type="button" onclick="studio03AddStep()">+ Ajouter une étape</button>
-            <button class="freeboard-tool" type="button" onclick="studio03DeleteStep()">Supprimer l’étape</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03AddStep()" aria-label="Ajouter une étape" title="Ajouter une étape">✚</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03DeleteStep()" aria-label="Supprimer l’étape" title="Supprimer l’étape">🗑</button>
             <label for="studio03-duration">Transition depuis l’étape précédente (secondes)</label>
             <input id="studio03-duration" type="number" inputmode="decimal" min="0.2" max="60" step="0.5" value="3" style="width:80px" onchange="studio03SetDuration(this.value)">
           </div>
           <div class="studio03-bar">
-            <button class="freeboard-tool" type="button" id="studio03-play" onclick="studio03Preview()">▶ Prévisualiser</button>
-            <button class="freeboard-tool" type="button" onclick="studio03StopPreview()">■ Arrêter</button>
+            <button class="freeboard-tool icon-tool" type="button" id="studio03-play" onclick="studio03Preview()" aria-label="Prévisualiser" title="Prévisualiser">▶</button>
+            <button class="freeboard-tool icon-tool" type="button" onclick="studio03StopPreview()" aria-label="Arrêter" title="Arrêter">■</button>
             <span id="studio03-time" aria-live="off">00:00 / 00:00</span>
           </div>
-          <p class="studio03-info">Déplace les joueurs ou le ballon, puis ajoute une étape et modifie les nouveaux placements. Les déplacements sont interpolés automatiquement. Les flèches et tracés sont associés à chaque étape. Le Studio est distinct des 9 séquences d’origine. La prévisualisation est muette : les narrations Augustin existantes ne sont pas modifiées.</p>
+          <p class="studio03-info compact-note">Déplace les éléments, ajoute des étapes puis prévisualise l’animation. Les tracés suivent chaque étape ; export conseillé pour conserver ton travail.</p>
           <p class="studio03-feedback" id="studio03-feedback" role="status" aria-live="polite"></p>
         </section>
 
@@ -1267,8 +1304,8 @@
               <rect x="850" y="232" width="16" height="76" stroke="var(--pitch-line-strong)" stroke-width="2.5"></rect>
               <circle cx="764" cy="270" r="2.5" fill="var(--pitch-line-strong)"></circle>
               <!-- Direction arrow -->
-              <text x="842" y="518" text-anchor="end" fill="var(--on-surface-variant)" stroke="none" font-family="var(--font-label)" font-size="11">SENS D’ATTAQUE →</text>
-              <text x="54" y="518" text-anchor="start" fill="var(--on-surface-variant)" stroke="none" font-family="var(--font-label)" font-size="11">COULOIR GAUCHE (HAUT) / COULOIR DROIT (BAS)</text>
+              <text x="842" y="518" text-anchor="end" class="pitch-direction-note" fill="var(--tertiary)" stroke="none" font-family="var(--font-label)" font-size="11">SENS D’ATTAQUE →</text>
+              <text x="54" y="518" text-anchor="start" class="pitch-direction-note" fill="var(--tertiary)" stroke="none" font-family="var(--font-label)" font-size="11">COULOIR GAUCHE (HAUT) / COULOIR DROIT (BAS)</text>
             </g>
 
             <!-- Dynamic Tactical Vectors & Geometric Overlays -->
@@ -1318,7 +1355,7 @@
             <span class="data-label" id="subtitle-phase-label">Phase 1 · Voix-off pédagogique</span>
             <span class="voice-status-badge" id="voice-status-badge">Voix-off prête</span>
           </div>
-          <p class="subtitle-text" id="subtitle-text">Appuyez sur Lecture pour démarrer l’animation et la narration vocale synchronisée.</p>
+          <p class="subtitle-text" id="subtitle-text">Appuie sur Lecture pour lancer l’animation.</p>
         </div>
 
         <!-- Interactive Video Player Controls -->
@@ -1334,17 +1371,14 @@
 
           <div class="controls-row">
             <div class="controls-group">
-              <button type="button" class="btn" id="btn-prev" onclick="prevSequence()" aria-label="Séquence précédente">
+              <button type="button" class="btn icon-btn" id="btn-prev" onclick="prevSequence()" aria-label="Séquence précédente" title="Séquence précédente">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg>
-                Précédent
               </button>
-              <button type="button" class="btn btn-primary" id="btn-play-pause" onclick="togglePlayPause()">
+              <button type="button" class="btn btn-primary icon-btn icon-btn-wide" id="btn-play-pause" onclick="togglePlayPause()" aria-label="Lecture / Pause" title="Lecture / Pause">
                 <svg id="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 <svg id="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
-                <span id="play-label">Lecture</span>
               </button>
-              <button type="button" class="btn" id="btn-next" onclick="nextSequence()" aria-label="Séquence suivante">
-                Suivant
+              <button type="button" class="btn icon-btn" id="btn-next" onclick="nextSequence()" aria-label="Séquence suivante" title="Séquence suivante">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
               </button>
             </div>
@@ -1377,7 +1411,7 @@
               </div>
             </div>
           </div>
-          <p id="offline-status" style="font-size:12px; margin:8px 2px 0; opacity:.85" role="status">Audio Augustin intégré · Installation hors connexion à vérifier</p>
+          
         </div>
       </section>
 
@@ -1480,9 +1514,8 @@
       </article>
     </section>
 
-    <footer class="sources-footer">
-      <span><strong>Sources &amp; Cadre méthodologique :</strong> Script vidéo 2-4-1 Saison 2026/27 (Élan Boucalais U13) · Didier Mari (« Animation défensive 2-4-1 » et « Animation offensive 2-4-1 » : repère but à 7, découpage Z1/Z2/Z3, couverture échelonnée, coulissement 3/4, 3 devant le but) · FFF GIFE U12/U13 (fiches 1/8 à 8/8 : touches règle de 4, tiroir, carré/losange, relance) · Notes CFI U10–U13 (méthode FAST, 3 espaces) · FIFA Training Centre (« Find your role on the pitch », « 8v8+1 Build and progress », « Defending as a unit », « Talent Coach 3.4 ») · Analyses Torofoot &amp; GafferBook · Corpus de référence 2-4-1.</span>
-      <span>Note : Les repères « ÉLAN / STOP » et « 3 secondes » sont des conventions pédagogiques du projet de jeu étudié, à adapter au niveau de maîtrise et au rapport d’opposition réel sur le terrain.</span>
+    <footer class="sources-footer compact-sources">
+      <button type="button" class="source-pill" title="Script vidéo 2-4-1 Saison 2026/27 (Élan Boucalais U13) · Didier Mari · FFF GIFE U12/U13 · Notes CFI U10–U13 · FIFA Training Centre · Torofoot · GafferBook · Corpus 2-4-1. Les repères ÉLAN / STOP et 3 secondes sont des conventions pédagogiques à adapter au niveau réel du groupe.">Sources</button>
     </footer>
   </div>
 
@@ -2427,6 +2460,7 @@
       playbackEpoch: 0,
       lastFrameTs: null,
       voices: [],
+      sequenceFilter: 'all',
 
       // Synchronisation animation / voix-off
       narrationFinished: true,
@@ -3347,7 +3381,7 @@
     window.addEventListener('pointercancel',completeFreeGesture);
     async function refreshFreeboardList(){
       const select=document.getElementById('freeboard-saved');if(!select)return;
-      const prior=select.value;select.innerHTML='<option value="">Mes compositions…</option>';
+      const prior=select.value;select.innerHTML='<option value="">Mes compos…</option>';
       try{const names=(await freeStore('keys')).filter(k=>typeof k==='string'&&k.startsWith('saved:')).sort();
         names.forEach(k=>{const option=document.createElement('option');option.value=k;option.textContent=k.slice(6);select.appendChild(option)});
         if(names.includes(prior))select.value=prior;
@@ -3431,7 +3465,7 @@
       document.getElementById('btn-mode-studio03')?.setAttribute('aria-pressed','true');
       document.getElementById('studio03-name').value=state.studio03Project.name;
       try{const auto=await freeStore('get',STUDIO03_PREFIX+'auto');if(state.studio03Mode&&studio03Valid(auto)){state.studio03Project=auto;state.studio03Step=auto.steps.length-1;applyFreeSnapshot(auto.steps[state.studio03Step].snapshot);document.getElementById('studio03-name').value=auto.name;}}catch(_){}
-      await studio03RefreshProjects();studio03RenderSteps();studio03Notice('Studio actif. Modifie les positions puis ajoute une étape.');
+      await studio03RefreshProjects();studio03RenderSteps();studio03Notice('');
     }
     function studio03New(){
       if(!state.studio03Mode)return;
@@ -3527,7 +3561,7 @@
     }
     async function studio03RefreshProjects(){
       const sel=document.getElementById('studio03-saved');if(!sel)return;
-      const selected=sel.value;sel.replaceChildren(new Option('Mes animations…',''));
+      const selected=sel.value;sel.replaceChildren(new Option('Mes animes…',''));
       try{const keys=(await freeStore('keys')).filter(x=>typeof x==='string'&&x.startsWith(STUDIO03_PREFIX+'saved:')).sort();
         keys.forEach(k=>sel.add(new Option(k.slice((STUDIO03_PREFIX+'saved:').length),k)));
         if(keys.includes(selected))sel.value=selected;
@@ -3607,27 +3641,79 @@
       if (wasPlaying) startPlayback();
     }
 
+
+    function categoryKey(label){
+      const s=String(label||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      if(s.includes('offensive')) return 'offensive';
+      if(s.includes('defensive')) return 'defensive';
+      if(s.includes('transition')) return 'transition';
+      if(s.includes('remise')) return 'restart';
+      return 'other';
+    }
+    function ensurePhaseFilter(){
+      const sel=document.getElementById('sequence-filter');
+      if(!sel) return;
+      const current=state.sequenceFilter||'all';
+      const cats=[...new Set(SEQUENCES.map(s=>s.category))];
+      sel.innerHTML='';
+      sel.appendChild(new Option('Toutes les phases','all'));
+      cats.forEach(c=>sel.appendChild(new Option(c,c)));
+      sel.value=cats.includes(current)||current==='all'?current:'all';
+    }
+    function applySequenceFilter(value){
+      state.sequenceFilter=value||'all';
+      const visible=SEQUENCES.map((s,i)=>({s,i})).filter(({s})=>state.sequenceFilter==='all'||s.category===state.sequenceFilter);
+      if(visible.length && !visible.some(v=>v.i===state.currentSeqIndex)){
+        state.currentSeqIndex=visible[0].i;
+        state.progress=0;
+      }
+      renderSequenceStrip();
+      renderDossierContent();
+      renderPitch();
+      saveAppState();
+    }
+    function exportPitchPdf(label){
+      const svg=document.getElementById('pitch-svg');
+      if(!svg){ alert('Terrain indisponible.'); return; }
+      const markup=new XMLSerializer().serializeToString(svg);
+      const blob=new Blob([markup],{type:'image/svg+xml;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const w=window.open('','_blank');
+      if(!w){ alert('Autorise les pop-ups pour exporter en PDF.'); return; }
+      w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${label}</title><style>body{font-family:Arial,sans-serif;background:#fff;color:#111;margin:20px}h1{font-size:20px;margin:0 0 12px}img{max-width:100%;height:auto;border:1px solid #ddd;border-radius:10px}p{font-size:12px;color:#444}</style></head><body><h1>${label}</h1><img src="${url}" alt="Export terrain"><p>Utilise la boîte d’impression du navigateur puis choisis « Enregistrer en PDF ».</p></body></html>`);
+      w.document.close();
+      setTimeout(()=>{w.focus();w.print();},350);
+      setTimeout(()=>URL.revokeObjectURL(url),3000);
+    }
+    function exportVideoNotice(isStudio){ const msg='Export MP4 prévu dans un lot dédié. Pour l’instant, utilise l’export PDF ou JSON.'; if(isStudio) studio03Notice(msg); else tellFreeboard(msg); }
+    function exportFreeboardPDF(){exportPitchPdf('KOLLECTIF — Ma compo');}
+    function exportFreeboardMP4(){exportVideoNotice(false);}
+    function studio03ExportPDF(){exportPitchPdf('KOLLECTIF — Mon animation');}
+    function studio03ExportMP4(){exportVideoNotice(true);}
+
     function renderSequenceStrip() {
+      ensurePhaseFilter();
       const strip = document.getElementById(`sequence-strip`);
-      const counter = document.getElementById(`active-seq-counter`);
-      if (counter) counter.textContent = `Séquence ${getCurrentSeq().code} / 0${SEQUENCES.length}`;
       if (!strip) return;
       strip.innerHTML = ``;
+      const filtered = SEQUENCES.map((seq, idx) => ({ seq, idx }))
+        .filter(({ seq }) => state.sequenceFilter === 'all' || seq.category === state.sequenceFilter);
 
-      SEQUENCES.forEach((seq, idx) => {
+      filtered.forEach(({ seq, idx }) => {
         const isMastered = state.masteredIds.includes(seq.id);
         const btn = document.createElement(`button`);
         btn.type = `button`;
         btn.className = `seq-card`;
+        btn.dataset.catKey = categoryKey(seq.category);
         btn.setAttribute(`aria-current`, String(idx === state.currentSeqIndex));
         btn.onclick = () => selectSequence(idx, false);
         btn.innerHTML = `
           <div class="seq-card-top">
             <span class="seq-num">${seq.code}</span>
-            <span class="seq-status-dot${isMastered ? ` mastered` : ``}">${isMastered ? `Acquise` : `${seq.duration}s`}</span>
+            <span class="seq-status-dot${isMastered ? ` mastered` : ``}">${isMastered ? `✓` : `${seq.duration}s`}</span>
           </div>
           <span class="seq-title">${seq.title}</span>
-          <span class="seq-cat">${seq.category}</span>
+          <span class="seq-cat ${'phase-'+categoryKey(seq.category)}">${seq.category}</span>
         `;
         strip.appendChild(btn);
       });
@@ -3641,7 +3727,7 @@
       const catEl = document.getElementById(`player-category`);
       const titleEl = document.getElementById(`player-title`);
       const objEl = document.getElementById(`seq-objective`);
-      if (catEl) catEl.textContent = seq.category;
+      if (catEl) { catEl.textContent = seq.category; catEl.className = `data-label phase-` + categoryKey(seq.category); }
       if (titleEl) titleEl.textContent = `${seq.code}. ${seq.title}`;
       if (objEl) objEl.textContent = seq.objective;
 
@@ -3882,7 +3968,8 @@
           voiceEnabled: state.voiceEnabled,
           selectedRoleId: state.selectedRoleId,
           masteredIds: state.masteredIds,
-          notesBySeq: state.notesBySeq
+          notesBySeq: state.notesBySeq,
+          sequenceFilter: state.sequenceFilter
         });
       } catch (e) {
         /* ignore persistence error */
@@ -3901,6 +3988,7 @@
           if (typeof saved.selectedRoleId === `string`) state.selectedRoleId = saved.selectedRoleId;
           if (Array.isArray(saved.masteredIds)) state.masteredIds = saved.masteredIds;
           if (saved.notesBySeq && typeof saved.notesBySeq === `object`) state.notesBySeq = saved.notesBySeq;
+          if (typeof saved.sequenceFilter === `string`) state.sequenceFilter = saved.sequenceFilter;
         }
       } catch (e) {
         /* ignore load error */
