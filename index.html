@@ -1066,8 +1066,8 @@
     .studio03 input,.studio03 select {font:inherit; color:var(--on-surface); background:var(--surface-container-high); border:1px solid var(--outline); border-radius:8px; padding:8px; min-height:42px; max-width:100%;}
     .studio03 .studio03-name {flex:1 1 190px;min-width:140px}
     .studio03 .freeboard-tool {min-height:42px}
-    .studio03-steps {display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:thin}
-    .studio03-step {flex:0 0 auto;min-width:112px;padding:10px; border:1px solid var(--outline);border-radius:10px;background:var(--surface-container-high);color:var(--on-surface);text-align:left;font:inherit;cursor:pointer}
+    .studio03-steps {display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px 2px;scrollbar-width:thin}
+    .studio03-step {flex:0 0 auto;min-width:112px;padding:10px; border:1px solid var(--outline);border-radius:10px;background:var(--surface-container-high);color:var(--on-surface);text-align:left;font:inherit;cursor:pointer;scroll-margin-left:8px}
     .studio03-step[aria-current="step"]{outline:2px solid var(--primary);background:var(--primary-container)}
     .studio03-step small{display:block;color:var(--on-surface-variant);font-size:11px;margin-top:4px}
     .studio03-info {color:var(--on-surface-variant);font-size:12px;line-height:1.5;margin:5px 0}
@@ -1081,16 +1081,29 @@
     .compact-metrics{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .metric-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:var(--hairline);border-radius:999px;background:var(--surface-container-low)}
     .metric-key{font-family:var(--font-label);font-size:.74rem;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:.04em}
-    .strip-toolbar{justify-content:flex-end}
-    .compact-select{min-width:210px}
+    .strip-toolbar{justify-content:flex-start}
+    .compact-select{min-width:190px}
+    .filter-stack{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+    .filter-stack .field-label{margin:0;white-space:nowrap}
+    .filter-stack .select-input{min-width:190px}
     .header-lede,.freeboard-help,.studio03-info,.pitch-direction-note,.subtitle-text{color:var(--tertiary)}
     .header-lede,.freeboard-help,.studio03-info{line-height:1.5}
+    .header-lede{font-size:1.02rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:none}
     .freeboard-studio,.studio03{padding:14px;border-radius:16px}
     .freeboard-tools,.freeboard-projects,.studio03-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
     .freeboard-projects select,.studio03-bar select{min-width:160px}
+    .studio03-select-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+    .studio03-select-row select{flex:1 1 240px}
+    .studio03-select-row .icon-tool{flex:0 0 auto}
+    .studio03-duration-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+    .studio03-duration-row label{white-space:nowrap}
+    .studio03-time-row{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
     .freeboard-tools .freeboard-tool,.freeboard-projects .freeboard-tool,.studio03 .freeboard-tool{min-width:42px;padding:8px 10px}
     .icon-tool{font-size:18px;line-height:1;font-weight:700}
     .icon-btn{min-width:52px;justify-content:center;padding-inline:12px}
+    #btn-loop,#btn-voice{min-width:0;padding-inline:16px}
+    #voice-label{min-width:2.4ch;text-align:center}
+    #loop-label{display:none}
     .icon-btn-wide{min-width:70px}
     .source-pill{border:var(--hairline);background:var(--surface-container-high);color:var(--tertiary);border-radius:999px;padding:8px 14px;cursor:help;font:inherit}
     .compact-sources{display:flex;justify-content:flex-end}
@@ -1112,7 +1125,17 @@
     .seq-card[data-cat-key="restart"] .seq-cat{color:#f3de7f}
     #offline-status{display:none!important}
     .subtitle-meta .data-label{color:var(--tertiary)}
+    .mnemonic-card{padding:18px 20px}
+    .mnemonic-title{font-size:1.1rem}
+    .acronym-row{padding:10px 12px}
+    #voice-select-wrap{min-width:260px}
+    #voice-select{min-width:260px}
+    @media (max-width:900px){
+      .header-lede{white-space:normal;overflow:visible;text-overflow:clip}
+    }
     @media (max-width:760px){
+      .compact-select{min-width:160px}
+      .filter-stack,.studio03-select-row,.studio03-duration-row,.studio03-time-row{flex-wrap:wrap}
       .compact-select{min-width:160px}
       .metric-chip{padding:6px 10px}
     }
@@ -1127,9 +1150,7 @@
       <div>
         <span class="data-label app-tagline" hidden>Football à 8 · Catégorie U12/U13 · Formation d’éducateurs</span>
         <h1 class="header-title">KOLLECTIF</h1>
-        <p class="header-lede compact-note">
-          Atelier interactif 2-4-1 : animation collective, ardoise libre et studio de création pour préparer, expliquer et faire vivre les séquences tactiques.
-        </p>
+        <p class="header-lede compact-note">Atelier interactif 2-4-1 : animation collective, ardoise libre et studio de création pour préparer, expliquer et faire vivre les séquences tactiques.</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
@@ -1142,9 +1163,9 @@
     <section class="sequence-strip-wrap" aria-label="Sélection des séquences tactiques">
       <div class="strip-head strip-toolbar">
         <div class="filter-stack">
-          <label for="sequence-filter" class="field-label">Filtre phase</label>
+          <label for="sequence-filter" class="field-label">Filtre</label>
           <select id="sequence-filter" class="select-input compact-select" onchange="applySequenceFilter(this.value)">
-            <option value="all">Toutes les phases</option>
+            <option value="all">Toutes</option>
           </select>
         </div>
       </div>
@@ -1221,9 +1242,8 @@
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03New()" aria-label="Nouvelle animation" title="Nouvelle animation">✚</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Save()" aria-label="Enregistrer l’animation" title="Enregistrer l’animation">💾</button>
           </div>
-          <div class="studio03-bar">
-            <label for="studio03-saved">Mes animes</label>
-            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Mes animes…</option></select>
+          <div class="studio03-bar studio03-select-row">
+            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Mes compos</option></select>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Load()" aria-label="Charger l’animation" title="Charger l’animation">📂</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Delete()" aria-label="Supprimer l’animation" title="Supprimer l’animation">🗑</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03Export()" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
@@ -1233,13 +1253,13 @@
             <input type="file" id="studio03-import" accept=".json,application/json" hidden onchange="studio03Import(event)">
           </div>
           <div id="studio03-steps" class="studio03-steps" role="group" aria-label="Étapes de l'animation"></div>
-          <div class="studio03-bar">
+          <div class="studio03-bar studio03-duration-row">
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03AddStep()" aria-label="Ajouter une étape" title="Ajouter une étape">✚</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03DeleteStep()" aria-label="Supprimer l’étape" title="Supprimer l’étape">🗑</button>
             <label for="studio03-duration">Transition depuis l’étape précédente (secondes)</label>
             <input id="studio03-duration" type="number" inputmode="decimal" min="0.2" max="60" step="0.5" value="3" style="width:80px" onchange="studio03SetDuration(this.value)">
           </div>
-          <div class="studio03-bar">
+          <div class="studio03-bar studio03-time-row">
             <button class="freeboard-tool icon-tool" type="button" id="studio03-play" onclick="studio03Preview()" aria-label="Prévisualiser" title="Prévisualiser">▶</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03StopPreview()" aria-label="Arrêter" title="Arrêter">■</button>
             <span id="studio03-time" aria-live="off">00:00 / 00:00</span>
@@ -1397,12 +1417,12 @@
 
               <button type="button" class="btn" id="btn-loop" aria-pressed="true" onclick="toggleLoop()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-                <span id="loop-label">Boucle : Séq.</span>
+                <span id="loop-label">Séq.</span>
               </button>
 
               <button type="button" class="btn btn-active" id="btn-voice" aria-pressed="true" onclick="toggleVoice()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
-                <span id="voice-label">Voix-off : ON</span>
+                <span id="voice-label">ON</span>
               </button>
 
               <div class="field-stack" id="voice-select-wrap">
@@ -1489,7 +1509,7 @@
     <section class="reference-grid" aria-label="Repères mnémotechniques ÉLAN et STOP">
       <article class="mnemonic-card">
         <div class="mnemonic-head">
-          <h2 class="mnemonic-title">ÉLAN — Avec le ballon</h2>
+          <h2 class="mnemonic-title">ÉLAN</h2>
           <span class="status-chip">Transition DEF → OFF</span>
         </div>
         <div class="acronym-list">
@@ -1502,7 +1522,7 @@
 
       <article class="mnemonic-card">
         <div class="mnemonic-head">
-          <h2 class="mnemonic-title">STOP — À la perte du ballon</h2>
+          <h2 class="mnemonic-title">STOP</h2>
           <span class="status-chip coral">Transition OFF → DEF</span>
         </div>
         <div class="acronym-list">
@@ -2612,7 +2632,7 @@
       const sel = document.getElementById('voice-select');
       if (wrap) wrap.hidden = false;
       if (sel) {
-        sel.innerHTML = '<option value="Augustin">Augustin — voix intégrée</option>';
+        sel.innerHTML = '<option value="Augustin">Augustin</option>';
         sel.value = 'Augustin';
         sel.disabled = true;
       }
@@ -3182,7 +3202,7 @@
       const btn = document.getElementById(`btn-loop`);
       const lbl = document.getElementById(`loop-label`);
       if (btn) btn.setAttribute(`aria-pressed`, `true`);
-      if (lbl) lbl.textContent = state.loopMode === `sequence` ? `Boucle : Séq.` : `Boucle : Tout`;
+      if (lbl) lbl.textContent = state.loopMode === `sequence` ? `Séq.` : `Tout`;
       saveAppState();
     }
 
@@ -3194,7 +3214,7 @@
         btn.setAttribute(`aria-pressed`, String(state.voiceEnabled));
         btn.classList.toggle(`btn-active`, state.voiceEnabled);
       }
-      if (lbl) lbl.textContent = state.voiceEnabled ? `Voix-off : ON` : `Voix-off : OFF`;
+      if (lbl) lbl.textContent = state.voiceEnabled ? `ON` : `OFF`;
       if (!state.voiceEnabled) {
         stopSpeech();
       } else {
@@ -3561,7 +3581,7 @@
     }
     async function studio03RefreshProjects(){
       const sel=document.getElementById('studio03-saved');if(!sel)return;
-      const selected=sel.value;sel.replaceChildren(new Option('Mes animes…',''));
+      const selected=sel.value;sel.replaceChildren(new Option('Mes compos',''));
       try{const keys=(await freeStore('keys')).filter(x=>typeof x==='string'&&x.startsWith(STUDIO03_PREFIX+'saved:')).sort();
         keys.forEach(k=>sel.add(new Option(k.slice((STUDIO03_PREFIX+'saved:').length),k)));
         if(keys.includes(selected))sel.value=selected;
@@ -3656,7 +3676,7 @@
       const current=state.sequenceFilter||'all';
       const cats=[...new Set(SEQUENCES.map(s=>s.category))];
       sel.innerHTML='';
-      sel.appendChild(new Option('Toutes les phases','all'));
+      sel.appendChild(new Option('Toutes','all'));
       cats.forEach(c=>sel.appendChild(new Option(c,c)));
       sel.value=cats.includes(current)||current==='all'?current:'all';
     }
@@ -4052,7 +4072,7 @@
       if (speedSel) speedSel.value = String(state.speed);
 
       const loopLbl = document.getElementById(`loop-label`);
-      if (loopLbl) loopLbl.textContent = state.loopMode === `sequence` ? `Boucle : Séq.` : `Boucle : Tout`;
+      if (loopLbl) loopLbl.textContent = state.loopMode === `sequence` ? `Séq.` : `Tout`;
 
       const vBtn = document.getElementById(`btn-voice`);
       const vLbl = document.getElementById(`voice-label`);
@@ -4060,7 +4080,7 @@
         vBtn.setAttribute(`aria-pressed`, String(state.voiceEnabled));
         vBtn.classList.toggle(`btn-active`, state.voiceEnabled);
       }
-      if (vLbl) vLbl.textContent = state.voiceEnabled ? `Voix-off : ON` : `Voix-off : OFF`;
+      if (vLbl) vLbl.textContent = state.voiceEnabled ? `ON` : `OFF`;
       updateVoiceBadge(state.voiceEnabled ? `Voix-off prête` : `Voix-off coupée`, false);
 
       renderSequenceStrip();
