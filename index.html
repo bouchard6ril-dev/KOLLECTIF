@@ -1045,6 +1045,22 @@
     #vertical-pitch-annotations text { paint-order:stroke; stroke:var(--pitch-turf); stroke-width:4px; stroke-linejoin:round; font-weight:700; font-size:11px; }
     @media(max-width:650px) { .lot01-settings{gap:9px;padding:10px;} .lot01-settings .lot01-field{flex-basis:calc(50% - 8px);} #pitch-svg.is-vertical{width:100%;} }
 
+
+    /* V5 — Lot 02 : ardoise libre et outils de création */
+    .freeboard-studio { margin:10px 0 14px; padding:12px; border:1px solid var(--outline); border-radius:12px; background:var(--surface-container); }
+    .freeboard-studio[hidden] { display:none !important; }
+    .freeboard-tools { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .freeboard-tool { padding:8px 11px; min-height:42px; border-radius:8px; border:1px solid var(--outline); background:var(--surface-container-high); color:var(--on-surface); cursor:pointer; font:inherit; font-size:12px; }
+    .freeboard-tool[aria-pressed="true"] { background:var(--primary-container); color:var(--on-primary-container); outline:2px solid var(--primary); }
+    .freeboard-projects { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+    .freeboard-projects input, .freeboard-projects select { font:inherit; color:var(--on-surface); background:var(--surface-container-high); border:1px solid var(--outline); border-radius:8px; padding:8px; min-height:42px; min-width:120px; flex:1 1 140px; }
+    .freeboard-help { margin:8px 0 0; font-size:12px; color:var(--on-surface-variant); }
+    #layer-free-marks { pointer-events:none; }
+    #layer-free-marks [data-mark-index] { pointer-events:visibleStroke; cursor:pointer; }
+    #layer-opponents .free-opponent, #layer-ball.free-ball { cursor:grab; touch-action:none; }
+    #pitch-svg.freeboard-drawing { cursor:crosshair; }
+    #freeboard-feedback { font-size:12px; min-height:18px; color:var(--tertiary); }
+
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1105,7 +1121,7 @@
         </div>
 
 
-        <!-- V5 · Lot 01 : réglages d'affichage (données tactiques inchangées) -->
+        <!-- V5 · Lot 01 R2 / Lot 02 LAB : réglages d'affichage (données tactiques inchangées) -->
         <div class="lot01-settings" id="lot01-settings" aria-label="Orientation et couleurs du terrain">
           <div class="lot01-field">
             <label for="lot01-orientation">Orientation du terrain</label>
@@ -1118,6 +1134,33 @@
           <div class="lot01-field"><label for="lot01-opponent">Adversaires</label><select id="lot01-opponent" class="lot01-select" aria-label="Couleur des adversaires" onchange="setPitchColor('opponent',this.value)"></select></div>
           <div class="lot01-field"><label for="lot01-goalkeeper">Gardien</label><select id="lot01-goalkeeper" class="lot01-select" aria-label="Couleur du gardien" onchange="setPitchColor('goalkeeper',this.value)"></select></div>
         </div>
+
+
+        <!-- V5 · Lot 02 : édition tactique. Ne touche pas aux séquences d'origine. -->
+        <section id="freeboard-studio" class="freeboard-studio" hidden aria-label="Outils de l'ardoise libre">
+          <div class="freeboard-tools" role="group" aria-label="Outils tactiques">
+            <button type="button" class="freeboard-tool" data-free-tool="move" aria-pressed="true" onclick="setFreeTool('move')">↔ Déplacer</button>
+            <button type="button" class="freeboard-tool" data-free-tool="arrow" aria-pressed="false" onclick="setFreeTool('arrow')">➜ Flèche</button>
+            <button type="button" class="freeboard-tool" data-free-tool="line" aria-pressed="false" onclick="setFreeTool('line')">／ Trait</button>
+            <button type="button" class="freeboard-tool" data-free-tool="pen" aria-pressed="false" onclick="setFreeTool('pen')">✎ Dessiner</button>
+            <button type="button" class="freeboard-tool" data-free-tool="erase" aria-pressed="false" onclick="setFreeTool('erase')">⌫ Gomme</button>
+            <button type="button" class="freeboard-tool" onclick="freeboardUndo()">↶ Annuler</button>
+            <button type="button" class="freeboard-tool" onclick="freeboardRedo()">↷ Rétablir</button>
+            <button type="button" class="freeboard-tool" onclick="resetFreeboard()">Réinitialiser</button>
+          </div>
+          <div class="freeboard-projects">
+            <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la composition" aria-label="Nom de la composition">
+            <button type="button" class="freeboard-tool" onclick="saveNamedFreeboard()">Enregistrer</button>
+            <select id="freeboard-saved" aria-label="Compositions enregistrées"><option value="">Mes compositions…</option></select>
+            <button type="button" class="freeboard-tool" onclick="loadNamedFreeboard()">Charger</button>
+            <button type="button" class="freeboard-tool" onclick="deleteNamedFreeboard()">Supprimer</button>
+            <button type="button" class="freeboard-tool" onclick="exportFreeboard()">Exporter JSON</button>
+            <button type="button" class="freeboard-tool" onclick="document.getElementById('freeboard-import').click()">Importer JSON</button>
+            <input type="file" id="freeboard-import" accept=".json,application/json" style="display:none" onchange="importFreeboard(event)">
+          </div>
+          <p class="freeboard-help">Déplace les joueurs des deux équipes ou le ballon. Pour tracer, choisis un outil puis dessine sur le terrain. Sauvegarde automatique locale par séquence ; export conseillé pour conserver une copie durable.</p>
+          <div id="freeboard-feedback" role="status" aria-live="polite"></div>
+        </section>
 
         <div class="pitch-stage">
           <svg id="pitch-svg" class="pitch-svg" viewBox="0 0 900 540" role="img" aria-label="Terrain tactique 2-4-1 animé en 2D">
@@ -1193,6 +1236,8 @@
               <circle id="ball-shadow" cx="95" cy="273" r="8" fill="var(--ball-stroke)" opacity="0.45"></circle>
               <circle id="ball-circle" cx="95" cy="270" r="7.5" fill="var(--ball-fill)" stroke="var(--ball-stroke)" stroke-width="2"></circle>
             </g>
+
+            <g id="layer-free-marks" aria-label="Annotations libres"></g>
 
             <!-- Dynamic On-Pitch Callout Badge -->
             <g id="layer-hud" aria-hidden="true"></g>
@@ -2305,6 +2350,14 @@
       layers: { zones: true, vectors: true, opponents: true },
       freeboardMode: false,
       freePositions: null,
+      freeOpponents: null,
+      freeBall: null,
+      freeMarks: [],
+      freeTool: 'move',
+      freeHistory: [],
+      freeRedo: [],
+      freeGesture: null,
+      freeRestoring: false,
       draggingId: null,
       selectedRoleId: `M6`,
       activeDossierTab: `tactics`,
@@ -2769,6 +2822,8 @@
       if (!frame) return;
 
       const activePlayers = state.freeboardMode && state.freePositions ? state.freePositions : frame.players;
+      const activeOpponents = state.freeboardMode && state.freeOpponents ? state.freeOpponents : frame.opp;
+      const activeBall = state.freeboardMode && state.freeBall ? state.freeBall : frame.ball;
 
       const zonesLayer = document.getElementById(`layer-zones`);
       if (zonesLayer) zonesLayer.style.display = state.layers.zones ? `block` : `none`;
@@ -2779,9 +2834,9 @@
       const oppLayer = document.getElementById(`layer-opponents`);
       if (oppLayer) {
         oppLayer.innerHTML = ``;
-        oppLayer.style.display = state.layers.opponents ? `block` : `none`;
-        frame.opp.forEach((pos, idx) => {
-          const grp = elSvg(`g`, { transform: `translate(${pos[0]}, ${pos[1]})` });
+        oppLayer.style.display = (state.layers.opponents || state.freeboardMode) ? `block` : `none`;
+        activeOpponents.forEach((pos, idx) => {
+          const grp = elSvg(`g`, { transform: `translate(${pos[0]}, ${pos[1]})`, class: state.freeboardMode ? 'free-opponent' : '', 'data-free-opponent': idx });
           grp.appendChild(elSvg(`circle`, {
             cx: 0, cy: 0, r: 14,
             fill: `var(--token-opp)`, stroke: `var(--token-opp-ink)`, 'stroke-width': `2`
@@ -2789,6 +2844,7 @@
           const txt = elSvg(`text`, { x: 0, y: 0, class: `opp-label`, fill: `var(--token-opp-ink)` });
           txt.textContent = idx === 0 ? `GA` : `A${idx + 1}`;
           grp.appendChild(txt);
+          if (state.freeboardMode) grp.addEventListener('pointerdown', ev => onFreeObjectDown(ev, 'opponent', idx));
           oppLayer.appendChild(grp);
         });
       }
@@ -2838,12 +2894,20 @@
       const ballCircle = document.getElementById(`ball-circle`);
       const ballShadow = document.getElementById(`ball-shadow`);
       if (ballCircle && ballShadow) {
-        ballCircle.setAttribute(`cx`, frame.ball[0]);
-        ballCircle.setAttribute(`cy`, frame.ball[1]);
-        ballShadow.setAttribute(`cx`, frame.ball[0] + 2);
-        ballShadow.setAttribute(`cy`, frame.ball[1] + 4);
+        ballCircle.setAttribute(`cx`, activeBall[0]);
+        ballCircle.setAttribute(`cy`, activeBall[1]);
+        ballShadow.setAttribute(`cx`, activeBall[0] + 2);
+        ballShadow.setAttribute(`cy`, activeBall[1] + 4);
+        const group = document.getElementById('layer-ball');
+        if (group) group.classList.toggle('free-ball',state.freeboardMode);
+        if (!ballCircle.dataset.freebound) {
+          ballCircle.addEventListener('pointerdown', ev=>onFreeObjectDown(ev,'ball',0));
+          ballShadow.addEventListener('pointerdown', ev=>onFreeObjectDown(ev,'ball',0));
+          ballCircle.dataset.freebound='1';
+        }
       }
 
+      renderFreeMarks();
       /* Scrubber & Timecode */
       const scrubber = document.getElementById(`timeline-scrubber`);
       if (scrubber) scrubber.value = String(Math.round(state.progress * 1000));
@@ -3086,68 +3150,177 @@
       renderPitch();
     }
 
-    function toggleFreeboard(forceVal) {
-      const next = typeof forceVal === `boolean` ? forceVal : !state.freeboardMode;
-      state.freeboardMode = next;
-      const btn = document.getElementById(`btn-mode-free`);
-      const actions = document.getElementById(`freeboard-actions`);
-      if (btn) btn.setAttribute(`aria-pressed`, String(next));
-      if (actions) actions.hidden = !next;
-
-      if (next) {
-        pausePlayback();
-        const frame = getInterpolatedFrame(getCurrentSeq(), state.progress);
-        state.freePositions = {};
-        for (const meta of TOKEN_META) {
-          const p = frame.players[meta.id] || [450, 270];
-          state.freePositions[meta.id] = [p[0], p[1]];
-        }
-      } else {
-        state.freePositions = null;
+    /* V5 LOT 02 — données modifiables, séparées des neuf animations de référence. */
+    const FREEBOARD_DB='ardoise-v5-freeboard', FREEBOARD_STORE='compositions';
+    let freeboardDBPromise=null;
+    function openFreeboardDB() {
+      if (!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB non disponible'));
+      if (!freeboardDBPromise) freeboardDBPromise=new Promise((resolve,reject)=>{
+        const req=indexedDB.open(FREEBOARD_DB,1);
+        req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(FREEBOARD_STORE))req.result.createObjectStore(FREEBOARD_STORE)};
+        req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error);
+      }).catch(e=>{freeboardDBPromise=null;throw e});
+      return freeboardDBPromise;
+    }
+    async function freeStore(operation,key,value) {
+      const db=await openFreeboardDB();
+      return new Promise((resolve,reject)=>{
+        const tx=db.transaction(FREEBOARD_STORE,operation==='get'||operation==='keys'?'readonly':'readwrite');
+        const store=tx.objectStore(FREEBOARD_STORE);
+        const req=operation==='get'?store.get(key):operation==='put'?store.put(value,key):operation==='delete'?store.delete(key):store.getAllKeys();
+        req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+      });
+    }
+    function freeSnapshot() {
+      return JSON.parse(JSON.stringify({schema:1,players:state.freePositions,opponents:state.freeOpponents,ball:state.freeBall,marks:state.freeMarks,sourceSequence:state.currentSeqIndex,updatedAt:new Date().toISOString()}));
+    }
+    function sanePoint(p) {return Array.isArray(p)&&p.length===2&&p.every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=900);}
+    function isValidFreeboard(obj) {
+      return !!(obj&&obj.schema===1&&obj.players&&typeof obj.players==='object'&&TOKEN_META.every(t=>sanePoint(obj.players[t.id]))&&Array.isArray(obj.opponents)&&obj.opponents.length<=40&&obj.opponents.every(sanePoint)&&sanePoint(obj.ball)&&Array.isArray(obj.marks)&&obj.marks.length<=1000&&obj.marks.every(m=>['arrow','line','pen'].includes(m.type)&&Array.isArray(m.points)&&m.points.length>=2&&m.points.length<=2000&&m.points.every(sanePoint)));
+    }
+    function applyFreeSnapshot(snap) {
+      if(!isValidFreeboard(snap))throw new Error('Composition invalide ou incompatible');
+      state.freePositions=JSON.parse(JSON.stringify(snap.players));state.freeOpponents=JSON.parse(JSON.stringify(snap.opponents));
+      state.freeBall=snap.ball.slice();state.freeMarks=JSON.parse(JSON.stringify(snap.marks));
+      renderPitch();
+    }
+    function tellFreeboard(message){const el=document.getElementById('freeboard-feedback');if(el)el.textContent=message;}
+    function rememberFreeEdit(){state.freeHistory.push(freeSnapshot());if(state.freeHistory.length>80)state.freeHistory.shift();state.freeRedo=[];}
+    async function persistFreeboard(){
+      if(!state.freeboardMode||!state.freePositions)return;
+      try{await freeStore('put','auto:'+state.currentSeqIndex,freeSnapshot());tellFreeboard('Composition sauvegardée automatiquement sur cet appareil.');}
+      catch(e){tellFreeboard('Sauvegarde locale indisponible : utilise Exporter JSON.');}
+    }
+    function setFreeTool(tool){
+      if(!['move','arrow','line','pen','erase'].includes(tool))return;
+      state.freeTool=tool;document.querySelectorAll('[data-free-tool]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.freeTool===tool)));
+      document.getElementById('pitch-svg')?.classList.toggle('freeboard-drawing',state.freeboardMode&&tool!=='move');
+    }
+    function initialFreeboardFromFrame(){
+      const frame=getInterpolatedFrame(getCurrentSeq(),state.progress);
+      state.freePositions={};TOKEN_META.forEach(meta=>{const p=frame.players[meta.id]||[450,270];state.freePositions[meta.id]=p.slice()});
+      state.freeOpponents=(frame.opp||[]).map(p=>p.slice());state.freeBall=frame.ball.slice();state.freeMarks=[];
+    }
+    async function toggleFreeboard(forceVal){
+      const next=typeof forceVal==='boolean'?forceVal:!state.freeboardMode;
+      if(next===state.freeboardMode)return;
+      if(state.freeboardMode&& !next)await persistFreeboard();
+      state.freeboardMode=next;state.freeGesture=null;state.draggingId=null;
+      document.getElementById('btn-mode-free')?.setAttribute('aria-pressed',String(next));
+      const oldActions=document.getElementById('freeboard-actions');if(oldActions)oldActions.hidden=true;
+      const studio=document.getElementById('freeboard-studio');if(studio)studio.hidden=!next;
+      if(next){pausePlayback();initialFreeboardFromFrame();state.freeHistory=[];state.freeRedo=[];setFreeTool('move');
+        try{const saved=await freeStore('get','auto:'+state.currentSeqIndex);if(state.freeboardMode&&saved&&isValidFreeboard(saved))applyFreeSnapshot(saved)}catch(e){tellFreeboard('Stockage local indisponible : exporte tes compositions pour les conserver.')}
+        await refreshFreeboardList();
+      } else {state.freePositions=null;state.freeOpponents=null;state.freeBall=null;state.freeMarks=[];setFreeTool('move')}
+      renderPitch();
+    }
+    function resetFreeboard(){if(!state.freeboardMode)return;rememberFreeEdit();initialFreeboardFromFrame();renderPitch();persistFreeboard()}
+    function freeboardUndo(){if(!state.freeboardMode||!state.freeHistory.length)return;state.freeRedo.push(freeSnapshot());applyFreeSnapshot(state.freeHistory.pop());persistFreeboard()}
+    function freeboardRedo(){if(!state.freeboardMode||!state.freeRedo.length)return;state.freeHistory.push(freeSnapshot());applyFreeSnapshot(state.freeRedo.pop());persistFreeboard()}
+    function clientToSvgCoords(clientX,clientY){
+      const group=document.getElementById('pitch-content'),svg=document.getElementById('pitch-svg');
+      if(!group||!svg||!group.getScreenCTM())return [450,270];
+      const point=svg.createSVGPoint();point.x=clientX;point.y=clientY;
+      const local=point.matrixTransform(group.getScreenCTM().inverse());
+      return [Math.round(clamp(local.x,55,845)*10)/10,Math.round(clamp(local.y,50,490)*10)/10];
+    }
+    function onFreeObjectDown(ev,kind,id){
+      if(!state.freeboardMode||state.freeTool!=='move')return;
+      ev.preventDefault();ev.stopPropagation();rememberFreeEdit();
+      state.freeGesture={kind,id,pointerId:ev.pointerId,changed:false};
+      if(kind==='team')selectRole(id,false);
+    }
+    function onTokenPointerDown(ev,id){onFreeObjectDown(ev,'team',id)}
+    function renderFreeMarks(){
+      const layer=document.getElementById('layer-free-marks');if(!layer)return;layer.replaceChildren();
+      if(!state.freeboardMode)return;
+      state.freeMarks.forEach((mark,i)=>{
+        if(!mark.points||mark.points.length<2)return;
+        const attrs={points:mark.points.map(p=>p.join(',')).join(' '),fill:'none',stroke:mark.type==='arrow'?'#f9df76':'#ffffff','stroke-width':mark.type==='pen'?3.5:3,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
+        if(mark.type==='arrow')attrs['marker-end']='url(#arrow-warn)';
+        layer.appendChild(elSvg('polyline',attrs));
+      });
+    }
+    document.getElementById('pitch-svg')?.addEventListener('pointerdown',ev=>{
+      if(!state.freeboardMode||state.freeTool==='move')return;
+      ev.preventDefault();ev.stopPropagation();
+      const markTarget=ev.target.closest?.('[data-mark-index]');
+      if(state.freeTool==='erase'){
+        if(markTarget){rememberFreeEdit();state.freeMarks.splice(Number(markTarget.dataset.markIndex),1);renderPitch();persistFreeboard()}
+        return;
+      }
+      const point=clientToSvgCoords(ev.clientX,ev.clientY);
+      rememberFreeEdit();
+      const mark={type:state.freeTool,points:[point,point.slice()]};state.freeMarks.push(mark);
+      state.freeGesture={kind:'mark',id:state.freeMarks.length-1,pointerId:ev.pointerId,changed:false};
+      try{document.getElementById('pitch-svg').setPointerCapture(ev.pointerId)}catch(_){}
+      renderFreeMarks();
+    },true);
+    window.addEventListener('pointermove',ev=>{
+      if(!state.freeboardMode||!state.freeGesture||state.freeGesture.pointerId!==ev.pointerId)return;
+      const g=state.freeGesture,point=clientToSvgCoords(ev.clientX,ev.clientY);g.changed=true;
+      if(g.kind==='team'&&state.freePositions)state.freePositions[g.id]=point;
+      else if(g.kind==='opponent'&&state.freeOpponents)state.freeOpponents[g.id]=point;
+      else if(g.kind==='ball')state.freeBall=point;
+      else if(g.kind==='mark'){
+        const mark=state.freeMarks[g.id];if(!mark)return;
+        if(mark.type==='pen'&&mark.points.length<2000)mark.points.push(point);
+        else mark.points[mark.points.length-1]=point;
       }
       renderPitch();
-    }
-
-    function resetFreeboard() {
-      if (!state.freeboardMode) return;
-      const frame = getInterpolatedFrame(getCurrentSeq(), state.progress);
-      state.freePositions = {};
-      for (const meta of TOKEN_META) {
-        const p = frame.players[meta.id] || [450, 270];
-        state.freePositions[meta.id] = [p[0], p[1]];
+    });
+    function completeFreeGesture(ev){
+      if(!state.freeGesture||state.freeGesture.pointerId!==ev.pointerId)return;
+      const gesture=state.freeGesture;state.freeGesture=null;
+      if(!gesture.changed&&gesture.kind==='mark'){
+        state.freeMarks.splice(gesture.id,1);state.freeHistory.pop();renderPitch();return;
       }
-      renderPitch();
+      if(!gesture.changed)state.freeHistory.pop();else persistFreeboard();
     }
-
-    /* Dragging in Freeboard Mode */
-    function clientToSvgCoords(clientX, clientY) {
-      const group=document.getElementById('pitch-content');
-      const svg=document.getElementById('pitch-svg');
-      if (!group || !svg) return [450,270];
-      const ctm=group.getScreenCTM();
-      if (!ctm) return [450,270];
-      const point=svg.createSVGPoint(); point.x=clientX; point.y=clientY;
-      const local=point.matrixTransform(ctm.inverse());
-      return [clamp(local.x,55,845),clamp(local.y,50,490)];
+    window.addEventListener('pointerup',completeFreeGesture);
+    window.addEventListener('pointercancel',completeFreeGesture);
+    async function refreshFreeboardList(){
+      const select=document.getElementById('freeboard-saved');if(!select)return;
+      const prior=select.value;select.innerHTML='<option value="">Mes compositions…</option>';
+      try{const names=(await freeStore('keys')).filter(k=>typeof k==='string'&&k.startsWith('saved:')).sort();
+        names.forEach(k=>{const option=document.createElement('option');option.value=k;option.textContent=k.slice(6);select.appendChild(option)});
+        if(names.includes(prior))select.value=prior;
+      }catch(e){tellFreeboard('Enregistrement indisponible dans ce navigateur.')}
     }
-
-    function onTokenPointerDown(ev, tokenId) {
-      if (!state.freeboardMode) return;
-      ev.preventDefault();
-      state.draggingId = tokenId;
-      selectRole(tokenId, false);
+    async function saveNamedFreeboard(){
+      if(!state.freeboardMode)return;
+      const name=document.getElementById('freeboard-name')?.value.trim();
+      if(!name){tellFreeboard('Indique un nom avant d’enregistrer.');return}
+      try{await freeStore('put','saved:'+name,freeSnapshot());await refreshFreeboardList();document.getElementById('freeboard-saved').value='saved:'+name;tellFreeboard('Composition « '+name+' » enregistrée localement. Pense à exporter une copie.')}
+      catch(e){tellFreeboard('Enregistrement impossible : exporte le fichier JSON.')}
     }
-
-    window.addEventListener(`pointermove`, ev => {
-      if (!state.freeboardMode || !state.draggingId || !state.freePositions) return;
-      const [x, y] = clientToSvgCoords(ev.clientX, ev.clientY);
-      state.freePositions[state.draggingId] = [x, y];
-      renderPitch();
-    });
-
-    window.addEventListener(`pointerup`, () => {
-      state.draggingId = null;
-    });
+    async function loadNamedFreeboard(){
+      if(!state.freeboardMode)return;
+      const key=document.getElementById('freeboard-saved')?.value;if(!key)return tellFreeboard('Sélectionne une composition.');
+      try{const item=await freeStore('get',key);if(!item)throw Error();rememberFreeEdit();applyFreeSnapshot(item);document.getElementById('freeboard-name').value=key.slice(6);persistFreeboard();tellFreeboard('Composition chargée.')}
+      catch(e){tellFreeboard('Cette composition ne peut pas être chargée.')}
+    }
+    async function deleteNamedFreeboard(){
+      const select=document.getElementById('freeboard-saved'),key=select?.value;if(!key)return;
+      if(!confirm('Supprimer cette composition enregistrée ?'))return;
+      try{await freeStore('delete',key);await refreshFreeboardList();tellFreeboard('Composition supprimée.')}catch(e){tellFreeboard('Suppression impossible.')}
+    }
+    function exportFreeboard(){
+      if(!state.freeboardMode)return;
+      const data={type:'ardoise-v5-freeboard',name:document.getElementById('freeboard-name')?.value||'Ardoise libre',snapshot:freeSnapshot()};
+      const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download='ardoise-composition-'+Date.now()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+      tellFreeboard('Export JSON créé : conserve ce fichier dans tes sauvegardes.');
+    }
+    async function importFreeboard(event){
+      const file=event.target.files?.[0];if(!file)return;
+      try{if(file.size>4_000_000)throw Error('Fichier trop volumineux');
+        const data=JSON.parse(await file.text());if(data.type!=='ardoise-v5-freeboard'||!isValidFreeboard(data.snapshot))throw Error('Format invalide');
+        if(!state.freeboardMode)await toggleFreeboard(true);
+        rememberFreeEdit();applyFreeSnapshot(data.snapshot);document.getElementById('freeboard-name').value=String(data.name||'Composition importée').slice(0,80);await persistFreeboard();tellFreeboard('Composition importée ; tu peux l’enregistrer sous un nom.')
+      }catch(e){tellFreeboard('Import impossible : '+e.message)}finally{event.target.value=''}
+    }
 
     /* Sequence Selection & UI Rendering */
     function selectSequence(index, autoPlay) {
@@ -3156,8 +3329,11 @@
       state.currentSeqIndex = clamp(index, 0, SEQUENCES.length - 1);
       state.progress = 0;
       state.lastCueIndex = -1;
+      if (state.freeboardMode) persistFreeboard();
       state.freeboardMode = false;
       state.freePositions = null;
+      state.freeOpponents = null; state.freeBall = null; state.freeMarks = []; state.freeGesture=null;
+      const studio=document.getElementById('freeboard-studio');if(studio)studio.hidden=true;
 
       const freeBtn = document.getElementById(`btn-mode-free`);
       const freeAct = document.getElementById(`freeboard-actions`);
@@ -3563,7 +3739,7 @@
       }
       try {
         const manifest = await fetch('./narrations.json').then(r => r.json());
-        const cache = await caches.open('ardoise-augustin-autonome-v4');
+        const cache = await caches.open('ardoise-augustin-autonome-v5-lot02');
         let ready = 0;
         for (const item of manifest.items) {
           if (await cache.match('./' + item.file)) ready++;
