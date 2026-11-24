@@ -1405,6 +1405,48 @@ body.ko-editing:not(.ko-view-split) .workspace{grid-template-columns:minmax(0,1f
 body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1.85fr) minmax(280px,.9fr)!important}
 .player-panel .lot01-settings .lot01-field{align-self:stretch;justify-content:flex-start!important}
 @media(max-width:900px){body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1fr)!important}}
+
+/* R6-C.1 — réglages rapprochés et compacts, alignés sur la même ligne. */
+.player-panel .lot01-settings{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(6px,1vw,12px)!important;
+  padding:9px 12px!important;
+  align-items:start!important;
+}
+.player-panel .lot01-settings .lot01-field{
+  align-self:start!important;
+  justify-content:flex-start!important;
+  gap:3px!important;
+  min-width:0!important;
+  max-width:100%;
+}
+.player-panel .lot01-settings .lot01-field label{
+  min-height:0!important;
+  margin:0!important;
+  font-size:12px!important;
+  line-height:1.15!important;
+}
+.player-panel .lot01-settings .lot01-field select,
+.player-panel .lot01-settings .ko-color-trigger{
+  height:38px!important;
+  min-height:38px!important;
+  padding:5px 8px!important;
+  font-size:13px!important;
+  line-height:1.1!important;
+}
+.player-panel .lot01-settings .ko-color-picker{
+  max-width:100%!important;
+  min-width:0!important;
+  flex:0 1 auto!important;
+}
+.player-panel .lot01-settings .ko-color-dot{
+  height:15px!important;width:15px!important;flex-basis:15px!important;
+}
+.player-panel .lot01-settings .ko-color-trigger{gap:6px!important;white-space:nowrap!important;}
+@media(max-width:760px){
+  .player-panel .lot01-settings{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
 </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1418,7 +1460,7 @@ body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1.85fr) 
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
-        <div class="app-version" aria-label="Version de l’application">v5.5 • R6C Atelier LAB</div>
+        <div class="app-version" aria-label="Version de l’application">v5.5.1 • R6C Atelier LAB</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -3292,7 +3334,7 @@ body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1.85fr) 
       const oppLayer = document.getElementById(`layer-opponents`);
       if (oppLayer) {
         oppLayer.innerHTML = ``;
-        oppLayer.style.display = (state.layers.opponents || state.freeboardMode) ? `block` : `none`;
+        oppLayer.style.display = state.layers.opponents ? `block` : `none`;
         activeOpponents.forEach((pos, idx) => {
           const grp = elSvg(`g`, { transform: `translate(${pos[0]}, ${pos[1]})`, class: state.freeboardMode ? 'free-opponent' : '', 'data-free-opponent': idx });
           appendMonoMedallion(grp,14,'opponent');
@@ -4750,6 +4792,17 @@ body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1.85fr) 
     });
 
     koLoadDisplayPrefs();
+    /* R6-C.1 — raccourcis d'édition Mac/Windows, sans capturer la frappe dans un champ. */
+    window.addEventListener('keydown', event => {
+      if (!state.freeboardMode || event.defaultPrevented || event.altKey) return;
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'z') return;
+      const active = event.target;
+      if (active?.isContentEditable || active?.closest?.('[contenteditable="true"]')) return;
+      const tag = active?.tagName?.toLowerCase();
+      if (['input','textarea','select'].includes(tag)) return;
+      event.preventDefault();
+      if (event.shiftKey) freeboardRedo(); else freeboardUndo();
+    });
     /* Keyboard shortcut: Space for Play/Pause outside inputs */
     window.addEventListener(`keydown`, ev => {
       const tag = (ev.target && ev.target.tagName) ? ev.target.tagName.toLowerCase() : ``;
