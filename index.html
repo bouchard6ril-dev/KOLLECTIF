@@ -1363,6 +1363,48 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
 .freeboard-studio .freeboard-projects select,.studio03-select-row select,.freeboard-tools select{color:var(--ko-ivoire);border-color:rgba(231,190,114,.5)!important;background:#1b2a2e}
 .freeboard-studio .freeboard-projects .freeboard-tool:focus-visible,.studio03 .freeboard-tool:focus-visible{outline:2px solid var(--ko-or)!important}
 
+
+
+/* KOLLECTIF R6-C — atelier unifié, barre sans défilement et pictos non ambigus. */
+.ko-text-entry{display:none!important}
+.pitch-view-controls{display:flex!important;align-items:center;gap:7px;flex-wrap:wrap}
+.ko-display-settings{margin-left:0!important;flex:0 0 auto}
+#pitch-view-mode{min-width:135px;max-width:175px}
+.ko-display-settings summary{width:44px;min-width:44px;height:42px;padding:5px}
+.player-panel .lot01-settings{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px!important;align-items:end!important}
+.player-panel .lot01-settings .lot01-field{flex:none!important;min-width:0!important;width:100%;display:flex;flex-direction:column;gap:5px;justify-content:flex-end}
+.player-panel .lot01-settings .lot01-field label{margin:0!important;min-height:18px!important;font-size:clamp(11px,1vw,14px);line-height:1.2;white-space:nowrap}
+.player-panel .lot01-settings .lot01-field select,.player-panel .lot01-settings .ko-color-picker{min-width:0;max-width:none;width:100%}
+.freeboard-studio{padding:12px!important;margin:10px 0 14px!important}
+.freeboard-studio .freeboard-tools,.freeboard-studio .freeboard-projects{display:flex!important;flex-wrap:wrap!important;overflow:visible!important;scrollbar-width:none!important;gap:6px!important;min-width:0;align-items:center;padding:0!important}
+.freeboard-studio .freeboard-tools>*{margin:0!important}
+.freeboard-studio .freeboard-tools>.freeboard-tool.icon-tool,.freeboard-studio .freeboard-projects .freeboard-tool.icon-tool{flex:0 0 45px!important;width:45px!important;min-width:45px!important;max-width:45px!important;padding:3px!important}
+.freeboard-studio .freeboard-tools>.compact-draw-select{flex:0 0 116px!important;width:116px!important;max-width:116px!important;min-width:0!important;padding:7px 6px!important}
+.freeboard-studio .freeboard-tools>#free-line-shape{flex-basis:103px!important;width:103px!important;max-width:103px!important}
+.freeboard-studio .freeboard-tools>#free-point-action{flex:0 0 126px!important;width:126px!important;max-width:126px!important}
+.freeboard-studio .freeboard-tools>#free-finish-path,.freeboard-studio .freeboard-tools>#free-cancel-path{flex:0 0 auto!important;padding:8px!important;font-size:13px}
+.ko-common-project{border-top:1px solid rgba(231,190,114,.23);margin-top:9px!important;padding-top:9px!important;display:flex!important;align-items:center;gap:8px!important}
+.ko-common-project>input:not([type=file]),.ko-common-project>select{flex:0 1 155px!important;width:155px!important;min-width:125px!important;max-width:170px!important;min-height:42px}
+.ko-common-project>.ko-file-actions{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-width:0}
+.ko-common-project>.ko-file-actions>button{flex:0 0 45px!important;width:45px!important;min-width:45px!important;max-width:45px!important;padding:3px!important}
+.ko-common-project [hidden]{display:none!important}
+.freeboard-studio .studio03{border:0!important;box-shadow:none!important;background:transparent!important;padding:11px 0 0!important;margin:6px 0 0!important;border-top:1px solid rgba(231,190,114,.22)!important;border-radius:0!important}
+.ko-studio-caption{font-size:12px;font-weight:700;letter-spacing:.08em;color:#e7be72;text-transform:uppercase;margin:0 0 8px}
+.freeboard-studio .studio03 .studio03-controls-row{overflow:visible!important;display:flex;flex-wrap:wrap!important;gap:8px}
+.freeboard-studio .studio03 .studio03-controls-row label{white-space:nowrap}
+.freeboard-studio .studio03 .studio03-info{display:none!important}
+.ko-native-premium{border-color:rgba(222,177,81,.65)!important;background:linear-gradient(160deg,#1c373a,#101a1c)!important;box-shadow:inset 0 1px 2px rgba(255,238,175,.2),0 2px 5px rgba(0,0,0,.5)}
+.ko-native-symbol{width:37px;height:37px;fill:none;stroke:#edc26b;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 3px rgba(235,168,66,.65))}
+#ko-multipoint-btn[aria-pressed=true]{box-shadow:0 0 0 2px #e7be72}
+@media(max-width:760px){.player-panel .lot01-settings{grid-template-columns:repeat(2,minmax(0,1fr))}.ko-common-project>input:not([type=file]),.ko-common-project>select{flex:1 1 130px!important}}
+@media(max-width:420px){.freeboard-studio .freeboard-tools>.freeboard-tool.icon-tool,.ko-common-project>.ko-file-actions>button{flex-basis:42px!important;width:42px!important;min-width:42px!important}.ko-common-project>.ko-file-actions{justify-content:flex-start}.ko-common-project>input:not([type=file]),.ko-common-project>select{flex:1 1 110px!important}}
+
+
+/* R6-C : offrir toute la largeur au terrain pendant la création, sans masquer les ressources pédagogiques. */
+body.ko-editing:not(.ko-view-split) .workspace{grid-template-columns:minmax(0,1fr)!important}
+body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1.85fr) minmax(280px,.9fr)!important}
+.player-panel .lot01-settings .lot01-field{align-self:stretch;justify-content:flex-start!important}
+@media(max-width:900px){body.ko-editing.ko-view-split .workspace{grid-template-columns:minmax(0,1fr)!important}}
 </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1376,7 +1418,7 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
-        <div class="app-version" aria-label="Version de l’application">v5.4 • R6B+UI02 LAB</div>
+        <div class="app-version" aria-label="Version de l’application">v5.5 • R6C Atelier LAB</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -1410,7 +1452,6 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
             <button type="button" class="toggle-chip" id="btn-layer-vectors" aria-pressed="true" onclick="toggleLayer('vectors')" title="Afficher / masquer les vecteurs">Vecteurs &amp; Triangles</button>
             <button type="button" class="toggle-chip" id="btn-layer-opponents" aria-pressed="true" onclick="toggleLayer('opponents')" title="Afficher / masquer le bloc adverse">Bloc adverse</button>
             <button type="button" class="toggle-chip mode-free" id="btn-mode-free" aria-pressed="false" onclick="toggleFreeboard()" title="Activer l’ardoise libre">Ardoise libre</button>
-            <button type="button" class="toggle-chip ko-text-entry" id="btn-open-text" onclick="koOpenTextTool()" title="Annoter le terrain avec du texte : police, taille, couleur et styles" aria-label="Ajouter du texte sur le terrain">✎ Texte</button>
             <button type="button" class="toggle-chip" id="btn-mode-studio03" aria-pressed="false" onclick="studio03Toggle()" title="Ouvrir le studio de création">🎬 Studio</button>
           </div>
         </div>
@@ -1466,6 +1507,7 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
             <button type="button" class="freeboard-tool icon-tool" onclick="resetFreeboard()" aria-label="Réinitialiser" title="Réinitialiser">⟳</button>
             <select id="free-line-family" class="compact-draw-select" aria-label="Type de tracé" onchange="setFreeLineFamily(this.value)" title="Type de tracé"><option value="pass">Passe / tir</option><option value="run">Dépl. sans ballon</option><option value="dribble">Dépl. avec ballon</option></select>
             <select id="free-line-shape" class="compact-draw-select" aria-label="Forme du tracé" onchange="setFreeLineShape(this.value)" title="Forme du tracé"><option value="straight">Droite</option><option value="curve-left">Courbe G</option><option value="curve-right">Courbe D</option><option value="polyline">Multi</option><option value="smooth">Multi lissé</option></select>
+            <button type="button" class="freeboard-tool icon-tool" id="ko-multipoint-btn" onclick="koChooseMulti()" title="Tracer une ligne à plusieurs points" aria-label="Tracé Multi-points">⌁</button>
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="editpoints" aria-pressed="false" onclick="setFreeTool('editpoints')" aria-label="Éditer les points" title="Sélectionner et modifier les points d’un tracé">◇</button>
             <select id="free-point-action" class="compact-draw-select" hidden aria-label="Opération sur les points" title="Opération sur les points" onchange="state.freePointAction=this.value"><option value="move">Déplacer point</option><option value="add">Ajouter point</option><option value="delete">Supprimer point</option></select>
             <button type="button" id="free-finish-path" class="freeboard-tool" hidden onclick="finishFreePath()" title="Terminer le tracé multi-points">✓ Terminer</button>
@@ -1482,40 +1524,30 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
             <button type="button" class="freeboard-tool" onclick="removeSelectedFreeText()" title="Supprimer le texte sélectionné">Suppr.</button>
             <span class="free-text-tip">Choisis T puis touche le terrain ; déplace un texte avec ↔.</span>
           </div>
-          <div class="freeboard-projects">
+          <div class="freeboard-projects ko-common-project" role="group" aria-label="Gestion de la création">
             <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la compo" aria-label="Nom de la composition">
-            <button type="button" class="freeboard-tool icon-tool" onclick="saveNamedFreeboard()" aria-label="Enregistrer la compo" title="Enregistrer la compo">💾</button>
+            <input id="studio03-name" class="studio03-name" maxlength="80" placeholder="Nouvelle anim" aria-label="Nom de l'animation" hidden>
             <select id="freeboard-saved" aria-label="Compositions enregistrées"><option value="">Mes compos…</option></select>
-            <button type="button" class="freeboard-tool icon-tool" onclick="loadNamedFreeboard()" aria-label="Charger la compo" title="Charger la compo">📂</button>
-            <button type="button" class="freeboard-tool icon-tool" onclick="deleteNamedFreeboard()" aria-label="Supprimer la compo" title="Supprimer la compo">🗑</button>
-            <button type="button" class="freeboard-tool icon-tool" onclick="exportFreeboard()" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
-            <button type="button" class="freeboard-tool icon-tool" onclick="document.getElementById('freeboard-import').click()" aria-label="Importer JSON" title="Importer JSON">⤒</button>
-            <button type="button" class="freeboard-tool icon-tool" onclick="exportFreeboardPDF()" aria-label="Exporter PDF" title="Exporter PDF">🧾</button>
-            <button type="button" class="freeboard-tool icon-tool" onclick="exportFreeboardMP4()" aria-label="Exporter MP4" title="Exporter MP4">🎞️</button>
-            <input type="file" id="freeboard-import" accept=".json,application/json" style="display:none" onchange="importFreeboard(event)">
+            <select id="studio03-saved" aria-label="Animations enregistrées" hidden><option value="">Mes animes</option></select>
+            <div class="ko-file-actions" aria-label="Fichiers et exports">
+              <button type="button" class="freeboard-tool icon-tool" data-ko-project="new" onclick="koProjectAction('new')" aria-label="Nouvelle animation" title="Nouvelle animation" hidden>＋</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('save')" aria-label="Enregistrer" title="Enregistrer">💾</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('load')" aria-label="Ouvrir" title="Ouvrir">📂</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('delete')" aria-label="Supprimer" title="Supprimer">🗑</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('export')" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('import')" aria-label="Importer JSON" title="Importer JSON">⤒</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('pdf')" aria-label="Exporter PDF" title="Exporter PDF">🧾</button>
+              <button type="button" class="freeboard-tool icon-tool" onclick="koProjectAction('mp4')" aria-label="Exporter MP4" title="Exporter MP4">🎞️</button>
+            </div>
+            <input type="file" id="freeboard-import" accept=".json,application/json" hidden onchange="importFreeboard(event)">
+            <input type="file" id="studio03-import" accept=".json,application/json" hidden onchange="studio03Import(event)">
           </div>
           <p class="freeboard-help compact-note">Déplace, trace puis sauvegarde ta compo. Export conseillé pour garder une copie durable.</p>
           <div id="freeboard-feedback" role="status" aria-live="polite"></div>
-        </section>
 
         <!-- Lot 03 : gestion des étapes et des projets, sans modifier SEQUENCES. -->
-        <section id="studio03" class="studio03" hidden aria-label="Studio de séquences animées">
-          <div class="studio03-bar">
-            <strong>🎬 Studio</strong>
-            <input id="studio03-name" class="studio03-name" maxlength="80" aria-label="Nom de la séquence créée" placeholder="Nouvelle anim">
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03New()" aria-label="Nouvelle animation" title="Nouvelle animation">✚</button>
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Save()" aria-label="Enregistrer l’animation" title="Enregistrer l’animation">💾</button>
-          </div>
-          <div class="studio03-bar studio03-select-row">
-            <select id="studio03-saved" aria-label="Choisir une animation sauvegardée"><option value="">Mes animes</option></select>
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Load()" aria-label="Charger l’animation" title="Charger l’animation">📂</button>
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Delete()" aria-label="Supprimer l’animation" title="Supprimer l’animation">🗑</button>
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03Export()" aria-label="Exporter JSON" title="Exporter JSON">⤓</button>
-            <button class="freeboard-tool icon-tool" type="button" onclick="document.getElementById('studio03-import').click()" aria-label="Importer JSON" title="Importer JSON">⤒</button>
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03ExportPDF()" aria-label="Exporter PDF" title="Exporter PDF">🧾</button>
-            <button class="freeboard-tool icon-tool" type="button" onclick="studio03ExportMP4()" aria-label="Exporter MP4" title="Exporter MP4">🎞️</button>
-            <input type="file" id="studio03-import" accept=".json,application/json" hidden onchange="studio03Import(event)">
-          </div>
+        <section id="studio03" class="studio03" hidden aria-label="Étapes d'animation">
+          <div class="ko-studio-caption">Animation · Étapes</div>
           <div id="studio03-steps" class="studio03-steps" role="group" aria-label="Étapes de l'animation"></div>
           <div class="studio03-bar studio03-controls-row">
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03AddStep()" aria-label="Ajouter une étape" title="Ajouter une étape">✚</button>
@@ -1528,6 +1560,7 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
           </div>
           <p class="studio03-info compact-note">Déplace, ajoute des étapes puis prévisualise. Exporte pour garder ton travail.</p>
           <p class="studio03-feedback" id="studio03-feedback" role="status" aria-live="polite"></p>
+        </section>
         </section>
 
         <div class="pitch-stage">
@@ -3749,7 +3782,7 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
         try{const saved=await freeStore('get','auto:'+state.currentSeqIndex);if(state.freeboardMode&&saved&&isValidFreeboard(saved))applyFreeSnapshot(saved)}catch(e){tellFreeboard('Stockage local indisponible : exporte tes compositions pour les conserver.')}
         await refreshFreeboardList();
       } else {state.freePositions=null;state.freeOpponents=null;state.freeBall=null;state.freeMarks=[];setFreeTool('move')}
-      renderPitch();
+      koCreativeSync();renderPitch();
     }
     function resetFreeboard(){if(!state.freeboardMode)return;state.freeDraft=null;state.freeSelectedMark=-1;rememberFreeEdit();initialFreeboardFromFrame();renderPitch();persistFreeboard()}
     function freeboardUndo(){if(state.freeDraft){state.freeDraft.points.pop();if(!state.freeDraft.points.length)state.freeDraft=null;renderFreeMarks();return;}if(!state.freeboardMode||!state.freeHistory.length)return;state.freeRedo.push(freeSnapshot());applyFreeSnapshot(state.freeHistory.pop());persistFreeboard()}
@@ -3996,6 +4029,7 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
       document.getElementById('studio03').hidden=true;
       document.getElementById('btn-mode-studio03')?.setAttribute('aria-pressed','false');
       document.querySelector('.player-panel')?.classList.remove('studio03-preview');
+      koCreativeSync();
     }
     async function studio03Toggle(){
       if(state.studio03Mode){studio03Exit();await toggleFreeboard(false);return;}
@@ -4009,7 +4043,7 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
       document.getElementById('btn-mode-studio03')?.setAttribute('aria-pressed','true');
       document.getElementById('studio03-name').value=state.studio03Project.name;
       try{const auto=await freeStore('get',STUDIO03_PREFIX+'auto');if(state.studio03Mode&&studio03Valid(auto)){state.studio03Project=auto;state.studio03Step=auto.steps.length-1;applyFreeSnapshot(auto.steps[state.studio03Step].snapshot);document.getElementById('studio03-name').value=auto.name;}}catch(_){}
-      await studio03RefreshProjects();studio03RenderSteps();studio03Notice('');
+      await studio03RefreshProjects();studio03RenderSteps();studio03Notice('');koCreativeSync();
     }
     function studio03New(){
       if(!state.studio03Mode)return;
@@ -4626,6 +4660,40 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
       /* No render/reinit: preserves current time, gestures, annotations and audio. */
       if(target==='normal') document.querySelector('.pitch-view-controls')?.scrollIntoView?.({block:'nearest'});
     }
+    /* R6-C — a single project bar, calling the existing storage/export implementations. */
+    function koProjectAction(action){
+      const anim=state.studio03Mode;
+      if(action==='new'){if(anim)studio03New();return;}
+      if(action==='save')return anim?studio03Save():saveNamedFreeboard();
+      if(action==='load')return anim?studio03Load():loadNamedFreeboard();
+      if(action==='delete')return anim?studio03Delete():deleteNamedFreeboard();
+      if(action==='export')return anim?studio03Export():exportFreeboard();
+      if(action==='import'){document.getElementById(anim?'studio03-import':'freeboard-import')?.click();return;}
+      if(action==='pdf')return anim?studio03ExportPDF():exportFreeboardPDF();
+      if(action==='mp4')return anim?studio03ExportMP4():exportFreeboardMP4();
+    }
+    function koCreativeSync(){
+      const anim=!!state.studio03Mode;
+      const on=!!state.freeboardMode;
+      const panel=document.getElementById('freeboard-studio');
+      if(panel)panel.classList.toggle('ko-anim-mode',anim);
+      document.body.classList.toggle('ko-editing',on);
+      for(const id of ['freeboard-name','freeboard-saved']){
+        const el=document.getElementById(id);if(el)el.hidden=anim;
+      }
+      for(const id of ['studio03-name','studio03-saved']){
+        const el=document.getElementById(id);if(el)el.hidden=!anim;
+      }
+      const create=document.querySelector('[data-ko-project="new"]');if(create)create.hidden=!anim;
+      const help=document.querySelector('.freeboard-help');if(help){help.textContent=anim?'Déplace les éléments, ajoute des étapes et prévisualise.':'Déplace les joueurs, trace et enregistre ta composition.';help.hidden=anim;}
+      const status=document.getElementById('freeboard-feedback');if(status&&anim)status.textContent='';
+      document.getElementById('btn-mode-free')?.setAttribute('aria-pressed',String(on&&!anim));
+    }
+    function koChooseMulti(){
+      const sel=document.getElementById('free-line-shape');if(sel)sel.value='polyline';
+      setFreeLineShape('polyline');
+      if(!['arrow','line'].includes(state.freeTool))setFreeTool('arrow');
+    }
     async function koOpenTextTool(){
       if(!state.freeboardMode)await toggleFreeboard(true);
       if(state.studio03Mode && !state.freeboardMode)await toggleFreeboard(true);
@@ -4773,18 +4841,29 @@ body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inli
     const menu={
       'Déplacer':'move','Tracer avec flèche':'pass','Tracer sans flèche':'shot',
       'Dessiner librement':'pen','Texte':'text','Gomme':'eraser','Annuler':'undo','Rétablir':'redo',
-      'Réinitialiser':'reset','Éditer les points':'point','Enregistrer la compo':'save',
+      'Réinitialiser':'reset','Tracé Multi-points':'multi','Enregistrer':'save','Ouvrir':'open','Supprimer':'delete','Enregistrer la compo':'save',
       'Charger la compo':'open','Supprimer la compo':'delete',
       'Exporter JSON':'export','Importer JSON':'import',
       'Exporter PDF':'pdf','Exporter MP4':'mp4',
       'Enregistrer l’animation':'save','Charger l’animation':'open',
-      'Supprimer l’animation':'delete','Nouvelle animation':'multi',
-      'Ajouter une étape':'multi','Supprimer l’étape':'delete',
-      'Prévisualiser':'mp4','Arrêter':'reset',
+      'Supprimer l’animation':'delete',
+      'Supprimer l’étape':'delete',
       'Importer une animation':'import'
     };
     document.querySelectorAll('.freeboard-tool.icon-tool').forEach(btn=>{
       const label=btn.getAttribute('aria-label')||'';
+      const custom={
+        'Éditer les points':'<circle cx="9" cy="9" r="3"/><circle cx="29" cy="12" r="3"/><circle cx="20" cy="29" r="3"/><path d="M12 10L26 12L21 26M28 25l6-9"/>',
+        'Nouvelle animation':'<path d="M9 6h14l6 6v20H9z"/><path d="M21 6v8h8M19 18v11M13.5 23.5h11"/>',
+        'Ajouter une étape':'<rect x="6" y="8" width="22" height="22" rx="3"/><path d="M17 12v14M10 19h14M28 15h7M31.5 11.5v7"/>',
+        'Prévisualiser':'<path d="M11 7l22 13-22 13z"/>',
+        'Arrêter':'<rect x="12" y="12" width="17" height="17" rx="2"/>'
+      };
+      if(custom[label]){
+        const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.setAttribute('viewBox','0 0 40 40');svg.setAttribute('class','ko-native-symbol');
+        svg.innerHTML=custom[label];btn.classList.add('ko-tool','ko-native-premium');btn.replaceChildren(svg);return;
+      }
       let key=menu[label];
       if(!key && label==='Tracer avec flèche')key='pass';
       if(!key)return;
