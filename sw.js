@@ -1,6 +1,6 @@
-// KOLLECTIF R5 — affichage actualisé, 28 narrations conservées depuis le cache précédent.
-const CACHE = 'ardoise-augustin-autonome-v5-lot03-r5';
-const OLD = 'ardoise-augustin-autonome-v5-lot03-r4';
+// KOLLECTIF R5.1 — studio compact, version visible et tracés enrichis.
+const CACHE = 'kollectif-v5-1';
+const OLD = 'ardoise-augustin-autonome-v5-lot03-r5';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './narrations.json'];
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

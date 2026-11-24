@@ -1214,6 +1214,24 @@
       .acronym-desc strong,.acronym-desc span{font-size:.75rem}
     }
 
+  
+    /* KOLLECTIF R5.1 — version, studio compact et tracés enrichis */
+    .app-version{align-self:flex-start;margin-left:auto;padding:4px 8px;border-radius:999px;border:1px solid var(--outline);background:var(--surface-container-high);color:var(--tertiary);font-size:12px;font-weight:700;letter-spacing:.08em}
+    .compact-draw-select{min-width:148px;max-width:190px;padding:8px 10px;min-height:42px;border-radius:8px;border:1px solid var(--outline);background:var(--surface-container-high);color:var(--on-surface);font:inherit;font-size:12px}
+    .studio03-controls-row{display:flex;flex-wrap:nowrap;gap:10px;align-items:center;overflow-x:auto;padding-bottom:2px}
+    .studio03-controls-row label,.studio03-controls-row span{white-space:nowrap}
+    .studio03-controls-row input{flex:0 0 80px}
+    .studio03-info{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .freeboard-help{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    @media (max-width: 900px){
+      .app-header{gap:10px}
+      .header-metrics{width:100%;justify-content:flex-start;position:relative}
+      .app-version{position:absolute;right:0;top:-2px}
+      .compact-draw-select{min-width:132px;flex:1 1 132px}
+      .studio03-controls-row{flex-wrap:wrap}
+      .studio03-info,.freeboard-help{white-space:normal;overflow:visible;text-overflow:clip}
+    }
+
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1227,6 +1245,7 @@
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
+        <div class="app-version" aria-label="Version de l’application">v5.1</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -1284,13 +1303,15 @@
         <section id="freeboard-studio" class="freeboard-studio" hidden aria-label="Outils de l'ardoise libre">
           <div class="freeboard-tools" role="group" aria-label="Outils tactiques">
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="move" aria-pressed="true" onclick="setFreeTool('move')" aria-label="Déplacer" title="Déplacer">↔</button>
-            <button type="button" class="freeboard-tool icon-tool" data-free-tool="arrow" aria-pressed="false" onclick="setFreeTool('arrow')" aria-label="Flèche" title="Flèche">➜</button>
-            <button type="button" class="freeboard-tool icon-tool" data-free-tool="line" aria-pressed="false" onclick="setFreeTool('line')" aria-label="Trait" title="Trait">／</button>
-            <button type="button" class="freeboard-tool icon-tool" data-free-tool="pen" aria-pressed="false" onclick="setFreeTool('pen')" aria-label="Dessiner" title="Dessiner">✎</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="arrow" aria-pressed="false" onclick="setFreeTool('arrow')" aria-label="Tracer avec flèche" title="Tracer avec flèche">➜</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="line" aria-pressed="false" onclick="setFreeTool('line')" aria-label="Tracer sans flèche" title="Tracer sans flèche">／</button>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="pen" aria-pressed="false" onclick="setFreeTool('pen')" aria-label="Dessiner librement" title="Dessiner librement">✎</button>
             <button type="button" class="freeboard-tool icon-tool" data-free-tool="erase" aria-pressed="false" onclick="setFreeTool('erase')" aria-label="Gomme" title="Gomme">⌫</button>
             <button type="button" class="freeboard-tool icon-tool" onclick="freeboardUndo()" aria-label="Annuler" title="Annuler">↶</button>
             <button type="button" class="freeboard-tool icon-tool" onclick="freeboardRedo()" aria-label="Rétablir" title="Rétablir">↷</button>
             <button type="button" class="freeboard-tool icon-tool" onclick="resetFreeboard()" aria-label="Réinitialiser" title="Réinitialiser">⟳</button>
+            <select id="free-line-family" class="compact-draw-select" aria-label="Type de tracé" onchange="setFreeLineFamily(this.value)" title="Type de tracé"><option value="pass">Passe / tir</option><option value="run">Dépl. sans ballon</option><option value="dribble">Dépl. avec ballon</option></select>
+            <select id="free-line-shape" class="compact-draw-select" aria-label="Forme du tracé" onchange="setFreeLineShape(this.value)" title="Forme du tracé"><option value="straight">Droite</option><option value="curve">Courbe</option></select>
           </div>
           <div class="freeboard-projects">
             <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la compo" aria-label="Nom de la composition">
@@ -1327,18 +1348,16 @@
             <input type="file" id="studio03-import" accept=".json,application/json" hidden onchange="studio03Import(event)">
           </div>
           <div id="studio03-steps" class="studio03-steps" role="group" aria-label="Étapes de l'animation"></div>
-          <div class="studio03-bar studio03-duration-row">
+          <div class="studio03-bar studio03-controls-row">
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03AddStep()" aria-label="Ajouter une étape" title="Ajouter une étape">✚</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03DeleteStep()" aria-label="Supprimer l’étape" title="Supprimer l’étape">🗑</button>
-            <label for="studio03-duration" title="Durée de transition depuis l’étape précédente, en secondes">Transition (s)</label>
+            <label for="studio03-duration" title="Durée de transition en secondes">Transition (s)</label>
             <input id="studio03-duration" type="number" inputmode="decimal" min="0.2" max="60" step="0.5" value="3" style="width:80px" onchange="studio03SetDuration(this.value)">
-          </div>
-          <div class="studio03-bar studio03-time-row">
             <button class="freeboard-tool icon-tool" type="button" id="studio03-play" onclick="studio03Preview()" aria-label="Prévisualiser" title="Prévisualiser">▶</button>
             <button class="freeboard-tool icon-tool" type="button" onclick="studio03StopPreview()" aria-label="Arrêter" title="Arrêter">■</button>
             <span id="studio03-time" aria-live="off">00:00 / 00:00</span>
           </div>
-          <p class="studio03-info compact-note">Déplace les éléments, ajoute des étapes puis prévisualise l’animation. Les tracés suivent chaque étape ; export conseillé pour conserver ton travail.</p>
+          <p class="studio03-info compact-note">Déplace, ajoute des étapes puis prévisualise. Exporte pour garder ton travail.</p>
           <p class="studio03-feedback" id="studio03-feedback" role="status" aria-live="polite"></p>
         </section>
 
@@ -2529,6 +2548,8 @@
       freeBall: null,
       freeMarks: [],
       freeTool: 'move',
+      freeLineFamily: 'pass',
+      freeLineShape: 'straight',
       freeHistory: [],
       freeRedo: [],
       freeGesture: null,
@@ -3364,7 +3385,7 @@
     }
     function sanePoint(p) {return Array.isArray(p)&&p.length===2&&p.every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=900);}
     function isValidFreeboard(obj) {
-      return !!(obj&&obj.schema===1&&obj.players&&typeof obj.players==='object'&&TOKEN_META.every(t=>sanePoint(obj.players[t.id]))&&Array.isArray(obj.opponents)&&obj.opponents.length<=40&&obj.opponents.every(sanePoint)&&sanePoint(obj.ball)&&Array.isArray(obj.marks)&&obj.marks.length<=1000&&obj.marks.every(m=>['arrow','line','pen'].includes(m.type)&&Array.isArray(m.points)&&m.points.length>=2&&m.points.length<=2000&&m.points.every(sanePoint)));
+      return !!(obj&&obj.schema===1&&obj.players&&typeof obj.players==='object'&&TOKEN_META.every(t=>sanePoint(obj.players[t.id]))&&Array.isArray(obj.opponents)&&obj.opponents.length<=40&&obj.opponents.every(sanePoint)&&sanePoint(obj.ball)&&Array.isArray(obj.marks)&&obj.marks.length<=1000&&obj.marks.every(m=>['arrow','line','pen','path'].includes(m.type)&&Array.isArray(m.points)&&m.points.length>=2&&m.points.length<=2000&&m.points.every(sanePoint)));
     }
     function applyFreeSnapshot(snap) {
       if(!isValidFreeboard(snap))throw new Error('Composition invalide ou incompatible');
@@ -3373,6 +3394,23 @@
       renderPitch();
     }
     function tellFreeboard(message){const el=document.getElementById('freeboard-feedback');if(el)el.textContent=message;}
+    function setFreeLineFamily(value){state.freeLineFamily=['pass','run','dribble'].includes(value)?value:'pass';}
+    function setFreeLineShape(value){state.freeLineShape=value==='curve'?'curve':'straight';}
+    function getMarkStyle(mark){
+      if(mark.type==='pen')return {stroke:'#ffffff',width:3.5,dash:'',arrow:false,curve:false};
+      const family=mark.lineFamily || (mark.type==='arrow' || mark.type==='line' ? 'pass' : 'pass');
+      const base = family==='run' ? {stroke:'var(--vector-run)', dash:'3 6'} : family==='dribble' ? {stroke:'var(--warning)', dash:'10 6'} : {stroke:'#f9df76', dash:''};
+      return {stroke:base.stroke,width:3,dash:base.dash,arrow:mark.arrowHead ?? (mark.type==='arrow'),curve:(mark.shape==='curve')};
+    }
+    function curvePathFromPoints(points){
+      const [a,b]=points; if(!a||!b) return '';
+      const mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+      const dx=b[0]-a[0], dy=b[1]-a[1], len=Math.hypot(dx,dy)||1;
+      const offset=Math.min(70, Math.max(22, len*0.18));
+      const cx=mx-dy/len*offset, cy=my+dx/len*offset;
+      return `M ${a[0]} ${a[1]} Q ${cx} ${cy} ${b[0]} ${b[1]}`;
+    }
+
     function rememberFreeEdit(){state.freeHistory.push(freeSnapshot());if(state.freeHistory.length>80)state.freeHistory.shift();state.freeRedo=[];}
     async function persistFreeboard(){
       if(state.studio03IgnoreFreePersist){state.studio03IgnoreFreePersist=false;return;}
@@ -3429,9 +3467,17 @@
       const marks=(state.studio03Previewing&&state.studio03PreviewMarks)?state.studio03PreviewMarks:state.freeMarks;
       marks.forEach((mark,i)=>{
         if(!mark.points||mark.points.length<2)return;
-        const attrs={points:mark.points.map(p=>p.join(',')).join(' '),fill:'none',stroke:mark.type==='arrow'?'#f9df76':'#ffffff','stroke-width':mark.type==='pen'?3.5:3,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
-        if(mark.type==='arrow')attrs['marker-end']='url(#arrow-warn)';
-        layer.appendChild(elSvg('polyline',attrs));
+        const style=getMarkStyle(mark);
+        const attrs={fill:'none',stroke:style.stroke,'stroke-width':style.width,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
+        if(style.dash)attrs['stroke-dasharray']=style.dash;
+        if(style.arrow){attrs['marker-end']= style.stroke==='var(--vector-run)' ? 'url(#arrow-run)' : style.stroke==='var(--warning)' ? 'url(#arrow-warn)' : 'url(#arrow-pass)';}
+        if(style.curve && mark.points.length===2 && mark.type!=='pen'){
+          attrs.d=curvePathFromPoints(mark.points);
+          layer.appendChild(elSvg('path',attrs));
+        }else{
+          attrs.points=mark.points.map(p=>p.join(',')).join(' ');
+          layer.appendChild(elSvg('polyline',attrs));
+        }
       });
     }
     document.getElementById('pitch-svg')?.addEventListener('pointerdown',ev=>{
@@ -3444,7 +3490,10 @@
       }
       const point=clientToSvgCoords(ev.clientX,ev.clientY);
       rememberFreeEdit();
-      const mark={type:state.freeTool,points:[point,point.slice()]};state.freeMarks.push(mark);
+      const mark=state.freeTool==='pen'
+        ? {type:'pen',points:[point,point.slice()]}
+        : {type:'path',points:[point,point.slice()],lineFamily:state.freeLineFamily,shape:state.freeLineShape,arrowHead:state.freeTool==='arrow'};
+      state.freeMarks.push(mark);
       state.freeGesture={kind:'mark',id:state.freeMarks.length-1,pointerId:ev.pointerId,changed:false};
       try{document.getElementById('pitch-svg').setPointerCapture(ev.pointerId)}catch(_){}
       renderFreeMarks();
