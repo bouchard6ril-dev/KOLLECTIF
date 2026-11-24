@@ -1267,6 +1267,20 @@
   .studio03-step[aria-current="step"]{box-shadow:inset 0 0 0 2px var(--ko-gold)!important}
   @media(prefers-reduced-motion:reduce){.freeboard-tool.ko-tool{transition:none}.freeboard-tool.ko-tool:hover{transform:none}}
 
+
+/* UI-03 LAB — préférences d'affichage non destructives */
+.ko-display-settings{position:relative;z-index:20}
+.ko-display-settings summary{list-style:none;border:1px solid rgba(231,190,114,.4);border-radius:10px;padding:9px 12px;cursor:pointer;background:#1B292E;color:var(--on-surface);font-size:13px;user-select:none}
+.ko-display-settings summary::-webkit-details-marker{display:none}
+.ko-display-settings-content{position:absolute;z-index:21000;top:calc(100% + 7px);right:0;width:min(310px,90vw);padding:13px;background:#152328;border:1px solid var(--ko-gold);border-radius:12px;box-shadow:0 15px 30px rgba(0,0,0,.45);display:grid;gap:10px}
+.ko-display-settings-content label{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--on-surface)}
+.ko-display-settings-content input{accent-color:var(--focus)}
+.ko-display-settings-content button{background:#27333A;border:1px solid var(--outline);border-radius:8px;padding:9px;color:var(--on-surface);font:inherit;cursor:pointer}
+body.ko-hide-subtitle .player-panel .subtitle-well{display:none!important}
+body.ko-hide-legend .player-panel .pitch-badge-bar{display:none!important}
+body.ko-compact .player-panel{gap:8px}
+body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
+
 </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1280,7 +1294,7 @@
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
-        <div class="app-version" aria-label="Version de l’application">v5.2 • OR LAB</div>
+        <div class="app-version" aria-label="Version de l’application">v5.3 • OR A LAB</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -1320,6 +1334,27 @@
 
 
         <!-- V5 · Lot 01 R2 / Lot 02 LAB : réglages d'affichage (données tactiques inchangées) -->
+        <div class="pitch-view-controls" role="group" aria-label="Affichage du terrain">
+          <label for="pitch-view-mode">Terrain</label>
+          <select id="pitch-view-mode" title="Choisir l'affichage du terrain" aria-label="Mode d’affichage du terrain" onchange="setKollectifPitchView(this.value)">
+            <option value="normal">Normal</option>
+            <option value="split">Demi-page</option>
+            <option value="full">Pleine page</option>
+            <option value="tv">Présentation TV</option>
+            <option value="popup">Pop-up</option>
+          </select>
+          <button id="pitch-view-back" type="button" title="Revenir à l’affichage normal (Échap)" onclick="setKollectifPitchView('normal')" hidden>✕ Fermer</button>
+          <details class="ko-display-settings" id="ko-display-settings">
+            <summary title="Préférences d’affichage du terrain">⚙ Options</summary>
+            <div class="ko-display-settings-content">
+              <label><input id="ko-show-subtitle" type="checkbox" checked onchange="koSetDisplayPref('showSubtitle',this.checked)"> Narration visible</label>
+              <label><input id="ko-show-legend" type="checkbox" checked onchange="koSetDisplayPref('showLegend',this.checked)"> Légende visible</label>
+              <label><input id="ko-compact-view" type="checkbox" onchange="koSetDisplayPref('compact',this.checked)"> Mode compact</label>
+              <label><input id="ko-remember-view" type="checkbox" onchange="koSetDisplayPref('remember',this.checked)"> Mémoriser la vue</label>
+              <button type="button" onclick="koResetDisplayPrefs()" title="Réinitialise uniquement ces préférences, sans toucher aux compositions">↺ Réinit. vue</button>
+            </div>
+          </details>
+        </div>
         <div class="lot01-settings" id="lot01-settings" aria-label="Orientation et couleurs du terrain">
           <div class="lot01-field">
             <label for="lot01-orientation">Orientation du terrain</label>
@@ -4302,6 +4337,63 @@
       document.addEventListener('touchcancel', () => {start=null;},{capture:true,passive:true});
     })();
 
+
+    /* UI-02 : The original SVG stays in the original player panel. No duplicated pitch or handlers. */
+    const KO_PITCH_MODES = new Set(['normal','split','full','tv','popup']);
+    const KO_PREF_KEY = 'kollectif.display-prefs.v1';
+    const KO_PREF_DEFAULT = Object.freeze({showSubtitle:true,showLegend:true,compact:false,remember:false,lastMode:'normal'});
+    let koPrefs = {...KO_PREF_DEFAULT};
+    let koPitchMode = 'normal';
+    function koSaveDisplayPrefs(){try{localStorage.setItem(KO_PREF_KEY,JSON.stringify(koPrefs))}catch(_){}}
+    function koApplyDisplayPrefs(){
+      document.body.classList.toggle('ko-hide-subtitle',!koPrefs.showSubtitle);
+      document.body.classList.toggle('ko-hide-legend',!koPrefs.showLegend);
+      document.body.classList.toggle('ko-compact',koPrefs.compact);
+      for(const [id,key] of [['ko-show-subtitle','showSubtitle'],['ko-show-legend','showLegend'],['ko-compact-view','compact'],['ko-remember-view','remember']]){
+        const el=document.getElementById(id);if(el)el.checked=koPrefs[key];
+      }
+    }
+    function koSetDisplayPref(key,value){
+      if(!Object.hasOwn(KO_PREF_DEFAULT,key)||key==='lastMode')return;
+      koPrefs[key]=Boolean(value);koApplyDisplayPrefs();koSaveDisplayPrefs();
+    }
+    function koResetDisplayPrefs(){
+      koPrefs={...KO_PREF_DEFAULT};koApplyDisplayPrefs();setKollectifPitchView('normal');koSaveDisplayPrefs();
+    }
+    function koLoadDisplayPrefs(){
+      try{
+        const obj=JSON.parse(localStorage.getItem(KO_PREF_KEY)||'{}');
+        if(obj&&typeof obj==='object'){
+          for(const k of ['showSubtitle','showLegend','compact','remember']) if(typeof obj[k]==='boolean')koPrefs[k]=obj[k];
+          if(['normal','split','full'].includes(obj.lastMode))koPrefs.lastMode=obj.lastMode;
+        }
+      }catch(_){}
+      koApplyDisplayPrefs();
+      if(koPrefs.remember)setKollectifPitchView(koPrefs.lastMode);
+    }
+    function setKollectifPitchView(mode){
+      const target = KO_PITCH_MODES.has(mode) ? mode : 'normal';
+      document.body.classList.remove('ko-view-split','ko-view-full','ko-view-tv','ko-view-popup');
+      koPitchMode = target;
+      if(target !== 'normal') document.body.classList.add('ko-view-'+target);
+      const sel = document.getElementById('pitch-view-mode');
+      if(sel) sel.value = target;
+      const back = document.getElementById('pitch-view-back');
+      if(back) back.hidden = (target === 'normal' || target === 'split');
+      const stage = document.querySelector('.pitch-stage');
+      if(stage) stage.setAttribute('data-pitch-view',target);
+      if(koPrefs.remember && ['normal','split','full'].includes(target)){
+        koPrefs.lastMode=target;koSaveDisplayPrefs();
+      }
+      /* No render/reinit: preserves current time, gestures, annotations and audio. */
+    }
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape' && koPitchMode !== 'normal'){
+        e.preventDefault();setKollectifPitchView('normal');
+      }
+    });
+
+    koLoadDisplayPrefs();
     /* Keyboard shortcut: Space for Play/Pause outside inputs */
     window.addEventListener(`keydown`, ev => {
       const tag = (ev.target && ev.target.tagName) ? ev.target.tagName.toLowerCase() : ``;
