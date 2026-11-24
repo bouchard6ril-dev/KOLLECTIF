@@ -1,5 +1,5 @@
 // KOLLECTIF R6-B LAB — texte sur terrain ; référence publiée A-Mono préservée.
-const CACHE = 'kollectif-r6b-text-lab-20261124';
+const CACHE = 'kollectif-r6b-ui02-correctif-20261124-v2';
 const OLD = 'kollectif-mono-a-20261124';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './icon-master-1024.png', './assets/kollectif-k.svg', ...["./assets/ui/point.png","./assets/ui/move.png","./assets/ui/pass.png","./assets/ui/shot.png","./assets/ui/curve-left.png","./assets/ui/curve-right.png","./assets/ui/multi.png","./assets/ui/text.png","./assets/ui/pen.png","./assets/ui/eraser.png","./assets/ui/undo.png","./assets/ui/redo.png","./assets/ui/reset.png","./assets/ui/open.png","./assets/ui/delete.png","./assets/ui/save.png","./assets/ui/import.png","./assets/ui/export.png","./assets/ui/pdf.png","./assets/ui/mp4.png"], './narrations.json'];
 self.addEventListener('install', event => {

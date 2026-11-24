@@ -1294,6 +1294,75 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
   .free-text-panel select{height:35px;padding:5px 8px;border-radius:7px;background:#1c2a30;color:#f2ede3;border:1px solid #64757b}
   .free-text-toggle[aria-pressed=true]{border-color:#e7be72!important;background:#453923!important;color:#fff1bb!important}
   .free-text-tip{font-size:12px;color:#a8b6ba}
+
+/* KOLLECTIF R6-B+UI02 correctif: vue terrain réelle, palette OR et barres condensées */
+:root{--ko-fond:#0e1b20;--ko-ivoire:#f2ede3;--ko-or:#e7be72;--ko-cyan:#54c9d5}
+.player-panel .subtitle-well .subtitle-meta #subtitle-phase-label,.player-panel .subtitle-well .subtitle-text{color:var(--ko-ivoire)!important}
+.player-panel .subtitle-well .subtitle-meta #subtitle-phase-label{color:var(--ko-or)!important}
+#btn-layer-zones[aria-pressed="true"],#btn-layer-vectors[aria-pressed="true"],#btn-layer-opponents[aria-pressed="true"],.toggle-chip[aria-pressed="true"]{background:rgba(231,190,114,.13);border-color:var(--ko-or);color:var(--ko-or)}
+.mnemonic-title{color:var(--ko-or)!important}
+#btn-open-text{border-color:rgba(231,190,114,.65);font-weight:700;white-space:nowrap}
+#btn-open-text[aria-pressed="true"]{background:#514025;color:#ffe3a2;box-shadow:0 0 12px rgba(231,190,114,.25)}
+.pitch-view-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;min-width:0}
+.pitch-view-controls label{white-space:nowrap;color:var(--ko-or);font-size:12px}
+#pitch-view-mode{max-width:160px;min-width:125px;padding:8px;min-height:40px;border:1px solid #886a39;background:#1a292c;color:var(--ko-ivoire);border-radius:9px}
+#pitch-view-back{border:1px solid #e7be72;background:#30291a;color:var(--ko-ivoire);border-radius:8px;cursor:pointer;padding:8px}
+.ko-display-settings{margin-left:auto}
+.ko-display-settings summary{height:40px;min-width:44px;padding:6px;display:flex;align-items:center;justify-content:center;font-size:23px;line-height:1;border-color:#a78346;color:#fbe5ad;box-shadow:inset 0 1px rgba(255,220,145,.1)}
+.ko-display-settings-content{width:min(295px,90vw)}
+.freeboard-studio .freeboard-tools{display:flex;flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;align-items:center;gap:5px!important;padding:5px 3px 9px}
+.freeboard-studio .freeboard-tools>.freeboard-tool.icon-tool{min-width:46px;flex:0 0 46px;padding:2px!important}
+.freeboard-studio .freeboard-tools>.compact-draw-select{flex:0 0 113px;min-width:113px!important;max-width:113px!important;width:113px;font-size:12px;padding:8px 4px;min-height:43px}
+.freeboard-studio .freeboard-tools>#free-line-shape{flex-basis:103px;min-width:103px!important;max-width:103px!important}
+.freeboard-studio .freeboard-tools>#free-point-action{flex-basis:116px}
+.freeboard-studio .freeboard-tools>.freeboard-tool:not(.icon-tool){flex:0 0 auto;white-space:nowrap}
+.freeboard-studio .freeboard-projects{display:flex;flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;align-items:center;gap:6px!important;padding:3px 0 9px}
+.freeboard-studio .freeboard-projects input#freeboard-name{flex:0 0 150px!important;width:150px;min-width:135px!important;max-width:160px!important}
+.freeboard-studio .freeboard-projects select#freeboard-saved{flex:0 0 145px!important;min-width:125px!important;max-width:145px!important;width:145px}
+.freeboard-studio .freeboard-projects>.freeboard-tool{flex:0 0 46px!important;min-width:46px}
+.studio03 .studio03-name{flex:0 0 190px!important;width:190px!important;max-width:200px!important;min-width:140px!important}
+.studio03 .studio03-select-row select#studio03-saved{flex:0 0 170px!important;width:170px!important;min-width:140px!important;max-width:180px!important}
+.studio03 .studio03-bar:first-child{display:flex;flex-wrap:nowrap;overflow-x:auto}
+.studio03 .studio03-select-row{display:flex;flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden}
+.studio03 .studio03-select-row .icon-tool{flex:0 0 46px}
+/* Liste couleur dessinée en HTML (l’OS ne garantit pas les couleurs des <option> natifs). */
+.ko-color-picker{display:inline-flex;position:relative;min-width:95px;width:100%;max-width:190px;flex:1 1 110px;align-items:center}
+.ko-native-color{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;min-width:0!important}
+.ko-color-trigger{display:flex;align-items:center;gap:9px;width:100%;min-height:41px;border-radius:9px;border:1px solid #ac8a47;background:#19282d;color:var(--ko-ivoire);font:inherit;cursor:pointer;padding:7px 10px}
+.ko-color-trigger:after{content:'▾';margin-left:auto;color:var(--ko-or)}
+.ko-color-dot{height:20px;width:20px;flex:0 0 20px;border-radius:50%;border:1px solid rgba(255,239,180,.85);box-shadow:inset 0 2px 3px rgba(255,255,255,.34),0 0 0 1px rgba(0,0,0,.2)}
+.ko-color-menu{position:absolute;z-index:30000;top:calc(100% + 4px);left:0;width:max(160px,100%);max-height:340px;overflow-y:auto;border:1px solid #c49848;border-radius:10px;background:#0e1b20;padding:5px;box-shadow:0 12px 30px rgba(0,0,0,.6)}
+.ko-color-menu[hidden]{display:none!important}
+.ko-color-choice{display:flex;align-items:center;gap:9px;width:100%;padding:6px 8px;background:transparent;color:#f2ede3;text-align:left;border:0;border-radius:6px;font:inherit;cursor:pointer}
+.ko-color-choice:hover,.ko-color-choice:focus-visible{background:#3c3321;outline:1px solid #e7be72}
+/* Grande vue : le terrain existant reste unique et garde toutes les coordonnées SVG. */
+body.ko-view-split .workspace{grid-template-columns:minmax(0,1.85fr) minmax(280px,.9fr)}
+body.ko-view-split .player-panel .pitch-stage{min-height:420px}
+body.ko-view-full .player-panel,body.ko-view-tv .player-panel{position:fixed!important;inset:8px;z-index:10000;background:#0e1b20;overflow-y:auto;border:2px solid #c79c4c;box-shadow:0 0 0 200vmax rgba(0,0,0,.8);padding:12px!important;gap:8px!important;max-height:calc(100dvh - 16px)}
+body.ko-view-full .player-panel .pitch-stage,body.ko-view-tv .player-panel .pitch-stage{min-height:40vh;flex:1 1 auto;overflow:hidden}
+body.ko-view-full .pitch-stage .pitch-svg,body.ko-view-tv .pitch-stage .pitch-svg{height:100%;width:100%;max-height:100%;aspect-ratio:auto;object-fit:contain}
+body.ko-view-tv .player-panel .player-head,body.ko-view-tv .player-panel .lot01-settings,body.ko-view-tv .player-panel .freeboard-studio,body.ko-view-tv .player-panel .studio03{display:none!important}
+body.ko-view-tv .player-panel .pitch-stage{min-height:60vh}
+body.ko-view-popup:before{content:'';position:fixed;inset:0;background:rgba(0,0,0,.77);z-index:10999}
+body.ko-view-popup .player-panel .pitch-stage{position:fixed!important;inset:8% 4% 9%;z-index:11000;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(241,181,68,.3);border:2px solid #c99d54;border-radius:16px}
+body.ko-view-popup .player-panel .pitch-stage .pitch-svg{width:100%;height:100%;max-height:100%;aspect-ratio:auto;object-fit:contain}
+body.ko-view-popup #pitch-view-back{position:fixed;right:5%;top:3%;z-index:11001}
+body.ko-view-full #pitch-view-back,body.ko-view-tv #pitch-view-back{display:inline-flex!important}
+@media(max-width:780px){body.ko-view-split .workspace{grid-template-columns:minmax(0,1fr)}body.ko-view-full .player-panel,body.ko-view-tv .player-panel{inset:2px;padding:5px!important}body.ko-view-full .player-panel .pitch-stage{min-height:43vh}}
+
+
+/* UI-01 OR : séquence/lecture, curseur et phases harmonisés */
+.transport-well .data-label,.timeline-header .data-label,.timeline-header label{color:var(--ko-or)!important}
+#btn-play-pause.btn-primary{background:linear-gradient(145deg,#ffe4a0,#c99337)!important;border-color:#ffd98a!important;color:#161b1d!important;box-shadow:0 2px 15px rgba(224,161,54,.2)}
+#btn-play-pause.btn-primary:hover{box-shadow:0 0 16px rgba(246,184,71,.35)}
+.timeline-range{accent-color:#e7be72}
+.timeline-range::-webkit-slider-thumb{background:#ffe2a0!important;border:2px solid #b88534!important;box-shadow:0 0 0 3px rgba(231,190,114,.22)!important}
+.cue-tick-btn.active,.cue-tick-btn[aria-current="true"]{color:#ffe4a9!important;border-color:#c99c4c!important;background:rgba(231,190,114,.16)!important}
+#voice-label{color:inherit}
+.mnemonic-title,.mnemonic-title strong{color:#e7be72!important}
+.freeboard-studio .freeboard-projects select,.studio03-select-row select,.freeboard-tools select{color:var(--ko-ivoire);border-color:rgba(231,190,114,.5)!important;background:#1b2a2e}
+.freeboard-studio .freeboard-projects .freeboard-tool:focus-visible,.studio03 .freeboard-tool:focus-visible{outline:2px solid var(--ko-or)!important}
+
 </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1307,7 +1376,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
-        <div class="app-version" aria-label="Version de l’application">v5.3 • OR A LAB</div>
+        <div class="app-version" aria-label="Version de l’application">v5.4 • R6B+UI02 LAB</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -1341,6 +1410,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
             <button type="button" class="toggle-chip" id="btn-layer-vectors" aria-pressed="true" onclick="toggleLayer('vectors')" title="Afficher / masquer les vecteurs">Vecteurs &amp; Triangles</button>
             <button type="button" class="toggle-chip" id="btn-layer-opponents" aria-pressed="true" onclick="toggleLayer('opponents')" title="Afficher / masquer le bloc adverse">Bloc adverse</button>
             <button type="button" class="toggle-chip mode-free" id="btn-mode-free" aria-pressed="false" onclick="toggleFreeboard()" title="Activer l’ardoise libre">Ardoise libre</button>
+            <button type="button" class="toggle-chip ko-text-entry" id="btn-open-text" onclick="koOpenTextTool()" title="Annoter le terrain avec du texte : police, taille, couleur et styles" aria-label="Ajouter du texte sur le terrain">✎ Texte</button>
             <button type="button" class="toggle-chip" id="btn-mode-studio03" aria-pressed="false" onclick="studio03Toggle()" title="Ouvrir le studio de création">🎬 Studio</button>
           </div>
         </div>
@@ -1358,7 +1428,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
           </select>
           <button id="pitch-view-back" type="button" title="Revenir à l’affichage normal (Échap)" onclick="setKollectifPitchView('normal')" hidden>✕ Fermer</button>
           <details class="ko-display-settings" id="ko-display-settings">
-            <summary title="Préférences d’affichage du terrain">⚙ Options</summary>
+            <summary title="Préférences d’affichage" aria-label="Options d’affichage">⚙</summary>
             <div class="ko-display-settings-content">
               <label><input id="ko-show-subtitle" type="checkbox" checked onchange="koSetDisplayPref('showSubtitle',this.checked)"> Narration visible</label>
               <label><input id="ko-show-legend" type="checkbox" checked onchange="koSetDisplayPref('showLegend',this.checked)"> Légende visible</label>
@@ -2768,7 +2838,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       root.setProperty(prefix+'-ink',pitchInk(PITCH_COLORS[value]));
       updateMonoGradient(which,PITCH_COLORS[value]);
       const chooser=document.getElementById('lot01-'+which);
-      if (chooser) { chooser.value=value; chooser.style.borderLeft='6px solid '+PITCH_COLORS[value]; }
+      if (chooser) { chooser.value=value; chooser.style.borderLeft='6px solid '+PITCH_COLORS[value]; chooser.closest('.ko-color-picker')?.koUpdate?.(); }
       persistPitchPrefs();
     }
     function initPitchSettings() {
@@ -2791,6 +2861,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
         setPitchColor(which,pitchPrefs[which]);
       }
       setPitchOrientation(pitchPrefs.orientation);
+      koInitColorPickers();
     }
 
     const SVG_NS = `http://www.w3.org/2000/svg`;
@@ -3654,7 +3725,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
     function setFreeTool(tool){
       if(!['move','arrow','line','pen','erase','editpoints','text'].includes(tool))return;
       if(state.freeDraft)cancelFreePath();
-      state.freeTool=tool;state.freeSelectedMark=-1;if(tool!=='text'&&tool!=='move')state.freeSelectedText=-1;
+      state.freeTool=tool;document.getElementById('btn-open-text')?.setAttribute('aria-pressed',String(tool==='text'&&state.freeboardMode));state.freeSelectedMark=-1;if(tool!=='text'&&tool!=='move')state.freeSelectedText=-1;
       document.querySelectorAll('[data-free-tool]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.freeTool===tool)));
       document.getElementById('pitch-svg')?.classList.toggle('freeboard-drawing',state.freeboardMode && !['move','editpoints'].includes(tool));
       updateFreeToolUI();renderFreeMarks();
@@ -3670,6 +3741,7 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
       if(next===state.freeboardMode)return;
       if(state.freeboardMode&& !next)await persistFreeboard();
       state.freeboardMode=next;state.freeGesture=null;state.draggingId=null;
+      if(!next)document.getElementById('btn-open-text')?.setAttribute('aria-pressed','false');
       document.getElementById('btn-mode-free')?.setAttribute('aria-pressed',String(next));
       const oldActions=document.getElementById('freeboard-actions');if(oldActions)oldActions.hidden=true;
       const studio=document.getElementById('freeboard-studio');if(studio)studio.hidden=!next;
@@ -4552,6 +4624,56 @@ body.ko-compact .player-panel .lot01-settings{padding:8px!important;gap:6px}
         koPrefs.lastMode=target;koSaveDisplayPrefs();
       }
       /* No render/reinit: preserves current time, gestures, annotations and audio. */
+      if(target==='normal') document.querySelector('.pitch-view-controls')?.scrollIntoView?.({block:'nearest'});
+    }
+    async function koOpenTextTool(){
+      if(!state.freeboardMode)await toggleFreeboard(true);
+      if(state.studio03Mode && !state.freeboardMode)await toggleFreeboard(true);
+      setFreeTool('text');
+      document.getElementById('btn-open-text')?.setAttribute('aria-pressed','true');
+      document.getElementById('free-text-panel')?.scrollIntoView?.({block:'nearest',behavior:'smooth'});
+    }
+    function koInitColorPickers(){
+      for(const which of ['team','opponent','goalkeeper']){
+        const original=document.getElementById('lot01-'+which);
+        if(!original||original.dataset.koPicker)continue;
+        original.dataset.koPicker='true';original.classList.add('ko-native-color');
+        const wrapper=document.createElement('div');wrapper.className='ko-color-picker';
+        const trigger=document.createElement('button');trigger.type='button';trigger.className='ko-color-trigger';
+        trigger.setAttribute('aria-label','Sélectionner la couleur : '+(which==='team'?'notre équipe':which==='opponent'?'adversaires':'gardien'));
+        trigger.setAttribute('aria-haspopup','true');trigger.setAttribute('aria-expanded','false');
+        const choices=document.createElement('div');choices.className='ko-color-menu';choices.hidden=true;
+        for(const opt of Array.from(original.options)){
+          const item=document.createElement('button');item.type='button';item.className='ko-color-choice';
+          const dot=document.createElement('span');dot.className='ko-color-dot';dot.style.backgroundColor=PITCH_COLORS[opt.value];
+          dot.style.boxShadow='0 0 0 1px #c9a363, inset 0 2px 3px rgba(255,255,255,.45)';
+          const label=document.createElement('span');label.textContent=opt.textContent;
+          item.append(dot,label);item.dataset.color=opt.value;
+          item.onclick=()=>{setPitchColor(which,opt.value);choices.hidden=true;trigger.setAttribute('aria-expanded','false')};
+          choices.appendChild(item);
+        }
+        trigger.onclick=()=>{
+          const open=choices.hidden;
+          document.querySelectorAll('.ko-color-menu').forEach(el=>el.hidden=true);
+          choices.hidden=!open;trigger.setAttribute('aria-expanded',String(open));
+        };
+        original.parentNode.insertBefore(wrapper,original);wrapper.append(original,trigger,choices);
+        wrapper.addEventListener('keydown',e=>{if(e.key==='Escape'){choices.hidden=true;trigger.focus()}});
+        wrapper.koUpdate=()=>{
+          const col=PITCH_COLORS[pitchPrefs[which]];
+          trigger.replaceChildren();
+          const sw=document.createElement('span');sw.className='ko-color-dot';sw.style.backgroundColor=col;
+          const label=document.createElement('span');label.textContent=PITCH_COLOR_NAMES[pitchPrefs[which]];
+          trigger.append(sw,label);
+        };
+        wrapper.koUpdate();
+      }
+      if(!window.koColorOutsideBound){
+        window.koColorOutsideBound=true;
+        document.addEventListener('pointerdown',ev=>{
+          if(!ev.target.closest('.ko-color-picker'))document.querySelectorAll('.ko-color-menu').forEach(el=>el.hidden=true);
+        });
+      }
     }
     document.addEventListener('keydown',e=>{
       if(e.key==='Escape' && koPitchMode !== 'normal'){
