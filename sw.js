@@ -1,6 +1,6 @@
 // ARDOISE V2 : mise a jour du lecteur sans recreer inutilement les 28 WAV.
-const CACHE = 'ardoise-augustin-autonome-v4';
-const OLD = 'ardoise-augustin-autonome-v2';
+const CACHE = 'ardoise-augustin-autonome-v5-lot01';
+const OLD = 'ardoise-augustin-autonome-v4';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './narrations.json'];
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
