@@ -1,6 +1,6 @@
-// KOLLECTIF R5.1 — studio compact, version visible et tracés enrichis.
-const CACHE = 'kollectif-v5-1';
-const OLD = 'ardoise-augustin-autonome-v5-lot03-r5';
+// KOLLECTIF R6-A LAB — version de test, préserve KOLLECTIF v5.1.
+const CACHE = 'kollectif-r6a-lab-20261124';
+const OLD = 'kollectif-v5-1';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './narrations.json'];
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
@@ -26,14 +26,11 @@ self.addEventListener('install', event => {
     await self.skipWaiting();
   })());
 });
-self.addEventListener('activate', event => {
- event.waitUntil((async () => {
-   const all = await caches.keys();
-   await Promise.all(all.filter(name=>name.startsWith('ardoise-augustin-') && name!==CACHE).map(name=>caches.delete(name)));
-   await self.clients.claim();
- })());
-});
+self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {
  if(event.request.method !== 'GET' || new URL(event.request.url).origin !== location.origin) return;
- event.respondWith((async()=> (await caches.match(event.request,{ignoreSearch:true})) || fetch(event.request))());
+ event.respondWith((async()=>{
+   const cache = await caches.open(CACHE);
+   return (await cache.match(event.request,{ignoreSearch:true})) || fetch(event.request);
+ })());
 });

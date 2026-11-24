@@ -1232,6 +1232,14 @@
       .studio03-info,.freeboard-help{white-space:normal;overflow:visible;text-overflow:clip}
     }
 
+    /* R6-A LAB — edit mode and multi-point toolbar */
+    #free-point-action[hidden],#free-finish-path[hidden],#free-cancel-path[hidden]{display:none!important}
+    .freeboard-tools{align-items:center}
+    #free-finish-path{border-color:var(--tertiary);color:var(--tertiary);font-weight:700;white-space:nowrap}
+    #free-cancel-path{white-space:nowrap}
+    #free-line-shape{min-width:140px}
+    #layer-free-marks [data-mark-index]{pointer-events:visibleStroke;cursor:crosshair}
+    #layer-free-marks [data-point-index]{pointer-events:all!important;cursor:grab}
   </style>
   <!-- Correctif commandes iOS V2 - 2026-11-22 -->
 </head>
@@ -1245,7 +1253,7 @@
         <p class="header-lede compact-note">Animations tactiques 2-4-1 · Ardoise libre · Studio de création</p>
       </div>
       <div class="header-metrics compact-metrics" aria-label="Résumé rapide">
-        <div class="app-version" aria-label="Version de l’application">v5.1</div>
+        <div class="app-version" aria-label="Version de l’application">v5.2 LAB</div>
         <div class="metric-chip"><span class="metric-key">Suivi</span><strong id="metric-mastered">0 / 9</strong></div>
         <div class="metric-chip"><span class="metric-key">Système</span><strong>1-2-4-1</strong></div>
         <div class="metric-chip"><span class="metric-key">Audio</span><strong id="metric-voice-state">Prêt</strong></div>
@@ -1311,7 +1319,11 @@
             <button type="button" class="freeboard-tool icon-tool" onclick="freeboardRedo()" aria-label="Rétablir" title="Rétablir">↷</button>
             <button type="button" class="freeboard-tool icon-tool" onclick="resetFreeboard()" aria-label="Réinitialiser" title="Réinitialiser">⟳</button>
             <select id="free-line-family" class="compact-draw-select" aria-label="Type de tracé" onchange="setFreeLineFamily(this.value)" title="Type de tracé"><option value="pass">Passe / tir</option><option value="run">Dépl. sans ballon</option><option value="dribble">Dépl. avec ballon</option></select>
-            <select id="free-line-shape" class="compact-draw-select" aria-label="Forme du tracé" onchange="setFreeLineShape(this.value)" title="Forme du tracé"><option value="straight">Droite</option><option value="curve">Courbe</option></select>
+            <select id="free-line-shape" class="compact-draw-select" aria-label="Forme du tracé" onchange="setFreeLineShape(this.value)" title="Forme du tracé"><option value="straight">Droite</option><option value="curve-left">Courbe G</option><option value="curve-right">Courbe D</option><option value="polyline">Multi</option><option value="smooth">Multi lissé</option></select>
+            <button type="button" class="freeboard-tool icon-tool" data-free-tool="editpoints" aria-pressed="false" onclick="setFreeTool('editpoints')" aria-label="Éditer les points" title="Sélectionner et modifier les points d’un tracé">◇</button>
+            <select id="free-point-action" class="compact-draw-select" hidden aria-label="Opération sur les points" title="Opération sur les points" onchange="state.freePointAction=this.value"><option value="move">Déplacer point</option><option value="add">Ajouter point</option><option value="delete">Supprimer point</option></select>
+            <button type="button" id="free-finish-path" class="freeboard-tool" hidden onclick="finishFreePath()" title="Terminer le tracé multi-points">✓ Terminer</button>
+            <button type="button" id="free-cancel-path" class="freeboard-tool" hidden onclick="cancelFreePath()" title="Annuler le tracé en cours">✕</button>
           </div>
           <div class="freeboard-projects">
             <input id="freeboard-name" type="text" maxlength="80" placeholder="Nom de la compo" aria-label="Nom de la composition">
@@ -2550,6 +2562,9 @@
       freeTool: 'move',
       freeLineFamily: 'pass',
       freeLineShape: 'straight',
+      freeDraft: null,
+      freePointAction: 'move',
+      freeSelectedMark: -1,
       freeHistory: [],
       freeRedo: [],
       freeGesture: null,
@@ -3395,20 +3410,59 @@
     }
     function tellFreeboard(message){const el=document.getElementById('freeboard-feedback');if(el)el.textContent=message;}
     function setFreeLineFamily(value){state.freeLineFamily=['pass','run','dribble'].includes(value)?value:'pass';}
-    function setFreeLineShape(value){state.freeLineShape=value==='curve'?'curve':'straight';}
+    function setFreeLineShape(value){
+      if(state.freeDraft)cancelFreePath();
+      state.freeLineShape=['straight','curve-left','curve-right','polyline','smooth'].includes(value)?value:'straight';
+      updateFreeToolUI();
+    }
+    function updateFreeToolUI(){
+      const edit=state.freeTool==='editpoints';
+      const action=document.getElementById('free-point-action');if(action)action.hidden=!edit;
+      const multi=['polyline','smooth'].includes(state.freeLineShape) && ['arrow','line'].includes(state.freeTool);
+      const finish=document.getElementById('free-finish-path');if(finish)finish.hidden=!multi;
+      const cancel=document.getElementById('free-cancel-path');if(cancel)cancel.hidden=!multi;
+    }
+    function cancelFreePath(){state.freeDraft=null;renderFreeMarks();tellFreeboard('Tracé en cours annulé.');}
+    function finishFreePath(){
+      if(!state.freeDraft||state.freeDraft.points.length<2){tellFreeboard('Place au moins deux points.');return;}
+      if(state.freeDraft.points.every(p=>p[0]===state.freeDraft.points[0][0] && p[1]===state.freeDraft.points[0][1])){cancelFreePath();return;}
+      rememberFreeEdit();state.freeMarks.push(state.freeDraft);state.freeDraft=null;
+      renderPitch();persistFreeboard();tellFreeboard('Tracé terminé. Sélectionne ◇ pour modifier ses points.');
+    }
+    function pathDistanceSq(p,a,b){
+      const dx=b[0]-a[0],dy=b[1]-a[1];
+      const t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/(dx*dx+dy*dy||1)));
+      const x=a[0]+t*dx,y=a[1]+t*dy;return (p[0]-x)**2+(p[1]-y)**2;
+    }
+    function nearestSegment(points,p){
+      let best=0,dist=Infinity;
+      for(let i=0;i<points.length-1;i++){const d=pathDistanceSq(p,points[i],points[i+1]);if(d<dist){dist=d;best=i;}}
+      return best;
+    }
+
     function getMarkStyle(mark){
       if(mark.type==='pen')return {stroke:'#ffffff',width:3.5,dash:'',arrow:false,curve:false};
       const family=mark.lineFamily || (mark.type==='arrow' || mark.type==='line' ? 'pass' : 'pass');
       const base = family==='run' ? {stroke:'var(--vector-run)', dash:'3 6'} : family==='dribble' ? {stroke:'var(--warning)', dash:'10 6'} : {stroke:'#f9df76', dash:''};
       return {stroke:base.stroke,width:3,dash:base.dash,arrow:mark.arrowHead ?? (mark.type==='arrow'),curve:(mark.shape==='curve')};
     }
-    function curvePathFromPoints(points){
-      const [a,b]=points; if(!a||!b) return '';
-      const mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
-      const dx=b[0]-a[0], dy=b[1]-a[1], len=Math.hypot(dx,dy)||1;
-      const offset=Math.min(70, Math.max(22, len*0.18));
-      const cx=mx-dy/len*offset, cy=my+dx/len*offset;
+    function curvePathFromPoints(points,shape='curve-left'){
+      const [a,b]=points;if(!a||!b)return '';
+      const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+      const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy)||1;
+      const offset=Math.min(75,Math.max(18,len*.25))*(shape==='curve-right'?-1:1);
+      const cx=mx-dy/len*offset,cy=my+dx/len*offset;
       return `M ${a[0]} ${a[1]} Q ${cx} ${cy} ${b[0]} ${b[1]}`;
+    }
+    function smoothedPath(points){
+      if(points.length<2)return '';
+      if(points.length===2)return `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]}`;
+      let d=`M ${points[0][0]} ${points[0][1]}`;
+      for(let i=1;i<points.length-1;i++){
+        const a=points[i],b=points[i+1],mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2;
+        d+=` Q ${a[0]} ${a[1]} ${mx} ${my}`;
+      }
+      const last=points[points.length-1];return d+` T ${last[0]} ${last[1]}`;
     }
 
     function rememberFreeEdit(){state.freeHistory.push(freeSnapshot());if(state.freeHistory.length>80)state.freeHistory.shift();state.freeRedo=[];}
@@ -3420,9 +3474,12 @@
       catch(e){tellFreeboard('Sauvegarde locale indisponible : utilise Exporter JSON.');}
     }
     function setFreeTool(tool){
-      if(!['move','arrow','line','pen','erase'].includes(tool))return;
-      state.freeTool=tool;document.querySelectorAll('[data-free-tool]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.freeTool===tool)));
-      document.getElementById('pitch-svg')?.classList.toggle('freeboard-drawing',state.freeboardMode&&tool!=='move');
+      if(!['move','arrow','line','pen','erase','editpoints'].includes(tool))return;
+      if(state.freeDraft)cancelFreePath();
+      state.freeTool=tool;state.freeSelectedMark=-1;
+      document.querySelectorAll('[data-free-tool]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.freeTool===tool)));
+      document.getElementById('pitch-svg')?.classList.toggle('freeboard-drawing',state.freeboardMode && !['move','editpoints'].includes(tool));
+      updateFreeToolUI();renderFreeMarks();
     }
     function initialFreeboardFromFrame(){
       const frame=getInterpolatedFrame(getCurrentSeq(),state.progress);
@@ -3444,8 +3501,8 @@
       } else {state.freePositions=null;state.freeOpponents=null;state.freeBall=null;state.freeMarks=[];setFreeTool('move')}
       renderPitch();
     }
-    function resetFreeboard(){if(!state.freeboardMode)return;rememberFreeEdit();initialFreeboardFromFrame();renderPitch();persistFreeboard()}
-    function freeboardUndo(){if(!state.freeboardMode||!state.freeHistory.length)return;state.freeRedo.push(freeSnapshot());applyFreeSnapshot(state.freeHistory.pop());persistFreeboard()}
+    function resetFreeboard(){if(!state.freeboardMode)return;state.freeDraft=null;state.freeSelectedMark=-1;rememberFreeEdit();initialFreeboardFromFrame();renderPitch();persistFreeboard()}
+    function freeboardUndo(){if(state.freeDraft){state.freeDraft.points.pop();if(!state.freeDraft.points.length)state.freeDraft=null;renderFreeMarks();return;}if(!state.freeboardMode||!state.freeHistory.length)return;state.freeRedo.push(freeSnapshot());applyFreeSnapshot(state.freeHistory.pop());persistFreeboard()}
     function freeboardRedo(){if(!state.freeboardMode||!state.freeRedo.length)return;state.freeHistory.push(freeSnapshot());applyFreeSnapshot(state.freeRedo.pop());persistFreeboard()}
     function clientToSvgCoords(clientX,clientY){
       const group=document.getElementById('pitch-content'),svg=document.getElementById('pitch-svg');
@@ -3465,34 +3522,78 @@
       const layer=document.getElementById('layer-free-marks');if(!layer)return;layer.replaceChildren();
       if(!state.freeboardMode)return;
       const marks=(state.studio03Previewing&&state.studio03PreviewMarks)?state.studio03PreviewMarks:state.freeMarks;
-      marks.forEach((mark,i)=>{
-        if(!mark.points||mark.points.length<2)return;
+      function drawMark(mark,i,draft=false){
+        if(!mark?.points?.length)return;
         const style=getMarkStyle(mark);
-        const attrs={fill:'none',stroke:style.stroke,'stroke-width':style.width,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
+        const attrs={fill:'none',stroke:style.stroke,'stroke-width':draft?2.5:style.width,'stroke-linecap':'round','stroke-linejoin':'round','data-mark-index':i};
         if(style.dash)attrs['stroke-dasharray']=style.dash;
-        if(style.arrow){attrs['marker-end']= style.stroke==='var(--vector-run)' ? 'url(#arrow-run)' : style.stroke==='var(--warning)' ? 'url(#arrow-warn)' : 'url(#arrow-pass)';}
-        if(style.curve && mark.points.length===2 && mark.type!=='pen'){
-          attrs.d=curvePathFromPoints(mark.points);
-          layer.appendChild(elSvg('path',attrs));
-        }else{
-          attrs.points=mark.points.map(p=>p.join(',')).join(' ');
-          layer.appendChild(elSvg('polyline',attrs));
+        if(draft)attrs.opacity='.8';
+        if(style.arrow && !draft)attrs['marker-end']=style.stroke==='var(--vector-run)'?'url(#arrow-run)':style.stroke==='var(--warning)'?'url(#arrow-warn)':'url(#arrow-pass)';
+        const shape=mark.shape||'straight';
+        const curve=mark.points.length>=2 && ['curve','curve-left','curve-right'].includes(shape) && mark.type!=='pen';
+        const smooth=mark.points.length>=2 && shape==='smooth' && mark.type!=='pen';
+        if(curve)attrs.d=curvePathFromPoints(mark.points,shape==='curve-right'?'curve-right':'curve-left');
+        else if(smooth)attrs.d=smoothedPath(mark.points);
+        else attrs.points=mark.points.map(p=>p.join(',')).join(' ');
+        const tag=(curve||smooth)?'path':'polyline';
+        if(!draft && state.freeTool==='editpoints' && mark.type!=='pen'){
+          const hit={...attrs,stroke:'transparent','stroke-width':20,opacity:1};
+          delete hit['marker-end'];delete hit['stroke-dasharray'];
+          const hitEl=elSvg(tag,hit);hitEl.style.pointerEvents='stroke';layer.appendChild(hitEl);
         }
-      });
+        if(mark.points.length>=2)layer.appendChild(elSvg(tag,attrs));
+        if(!draft && state.freeTool==='editpoints' && i===state.freeSelectedMark){
+          mark.points.forEach((p,k)=>{
+            const handle=elSvg('circle',{cx:p[0],cy:p[1],r:8,fill:'#ffffff',stroke:'#12bed2','stroke-width':2,'data-mark-index':i,'data-point-index':k});
+            handle.style.pointerEvents='all';layer.appendChild(handle);
+          });
+        }
+      }
+      marks.forEach((mark,i)=>drawMark(mark,i));
+      if(state.freeDraft){drawMark(state.freeDraft,-1,true);state.freeDraft.points.forEach(pt=>layer.appendChild(elSvg('circle',{cx:pt[0],cy:pt[1],r:4,fill:'#ffdd83',stroke:'#111','stroke-width':1})));}
     }
     document.getElementById('pitch-svg')?.addEventListener('pointerdown',ev=>{
       if(!state.freeboardMode||state.freeTool==='move'||state.studio03Previewing)return;
       ev.preventDefault();ev.stopPropagation();
-      const markTarget=ev.target.closest?.('[data-mark-index]');
+      const target=ev.target?.closest?.('[data-mark-index]');
+      const markIndex=target?Number(target.dataset.markIndex):-1;
+      const pointIndex=target?.hasAttribute('data-point-index')?Number(target.dataset.pointIndex):-1;
+      const pt=clientToSvgCoords(ev.clientX,ev.clientY);
       if(state.freeTool==='erase'){
-        if(markTarget){rememberFreeEdit();state.freeMarks.splice(Number(markTarget.dataset.markIndex),1);renderPitch();persistFreeboard()}
-        return;
+        if(markIndex>=0){rememberFreeEdit();state.freeMarks.splice(markIndex,1);state.freeSelectedMark=-1;renderPitch();persistFreeboard();}return;
       }
-      const point=clientToSvgCoords(ev.clientX,ev.clientY);
+      if(state.freeTool==='editpoints'){
+        if(markIndex<0){state.freeSelectedMark=-1;renderFreeMarks();return;}
+        state.freeSelectedMark=markIndex;
+        const mark=state.freeMarks[markIndex];if(!mark)return;
+        if(state.freePointAction==='delete'){
+          if(pointIndex<0){tellFreeboard('Sélectionne un point blanc à supprimer.');renderFreeMarks();return;}
+          if(mark.points.length<=2){tellFreeboard('Un tracé conserve au moins deux points.');return;}
+          rememberFreeEdit();mark.points.splice(pointIndex,1);
+          if(mark.points.length>2||mark.shape==='curve-left'||mark.shape==='curve-right'||mark.shape==='curve')mark.shape='polyline';
+          renderPitch();persistFreeboard();return;
+        }
+        if(state.freePointAction==='add'){
+          rememberFreeEdit();const at=nearestSegment(mark.points,pt);mark.points.splice(at+1,0,pt);
+          if(['straight','curve-left','curve-right','curve'].includes(mark.shape))mark.shape='polyline';
+          renderPitch();persistFreeboard();return;
+        }
+        if(pointIndex>=0){
+          rememberFreeEdit();state.freeGesture={kind:'point',id:markIndex,pointIndex,pointerId:ev.pointerId,changed:false};
+          try{document.getElementById('pitch-svg').setPointerCapture(ev.pointerId);}catch(_){}
+        }
+        renderFreeMarks();return;
+      }
+      if(['polyline','smooth'].includes(state.freeLineShape)&&state.freeTool!=='pen'){
+        if(!state.freeDraft)state.freeDraft={type:'path',points:[],lineFamily:state.freeLineFamily,shape:state.freeLineShape,arrowHead:state.freeTool==='arrow'};
+        if(state.freeDraft.points.length>=100){tellFreeboard('Limite : 100 points, termine ce tracé.');return;}
+        state.freeDraft.points.push(pt);renderFreeMarks();
+        tellFreeboard(`${state.freeDraft.points.length} point(s) — clique sur « ✓ Terminer » quand ton tracé est prêt.`);return;
+      }
       rememberFreeEdit();
       const mark=state.freeTool==='pen'
-        ? {type:'pen',points:[point,point.slice()]}
-        : {type:'path',points:[point,point.slice()],lineFamily:state.freeLineFamily,shape:state.freeLineShape,arrowHead:state.freeTool==='arrow'};
+        ? {type:'pen',points:[pt,pt.slice()]}
+        : {type:'path',points:[pt,pt.slice()],lineFamily:state.freeLineFamily,shape:state.freeLineShape,arrowHead:state.freeTool==='arrow'};
       state.freeMarks.push(mark);
       state.freeGesture={kind:'mark',id:state.freeMarks.length-1,pointerId:ev.pointerId,changed:false};
       try{document.getElementById('pitch-svg').setPointerCapture(ev.pointerId)}catch(_){}
@@ -3504,6 +3605,9 @@
       if(g.kind==='team'&&state.freePositions)state.freePositions[g.id]=point;
       else if(g.kind==='opponent'&&state.freeOpponents)state.freeOpponents[g.id]=point;
       else if(g.kind==='ball')state.freeBall=point;
+      else if(g.kind==='point'){
+        const mark=state.freeMarks[g.id];if(mark?.points?.[g.pointIndex])mark.points[g.pointIndex]=point;
+      }
       else if(g.kind==='mark'){
         const mark=state.freeMarks[g.id];if(!mark)return;
         if(mark.type==='pen'&&mark.points.length<2000)mark.points.push(point);
@@ -3520,6 +3624,12 @@
       if(!gesture.changed)state.freeHistory.pop();else persistFreeboard();
     }
     window.addEventListener('pointerup',completeFreeGesture);
+    window.addEventListener('keydown',ev=>{
+      if(!state.freeboardMode||!state.freeDraft)return;
+      if(ev.key==='Escape'){ev.preventDefault();cancelFreePath();}
+      else if(ev.key==='Enter'){ev.preventDefault();finishFreePath();}
+      else if(ev.key==='Backspace'&&ev.target===document.body){ev.preventDefault();state.freeDraft.points.pop();renderFreeMarks();}
+    });
     window.addEventListener('pointercancel',completeFreeGesture);
     async function refreshFreeboardList(){
       const select=document.getElementById('freeboard-saved');if(!select)return;
